@@ -246,35 +246,8 @@ Data is stored in `EyeTrackingSession` table for per-user analysis.
 
 ## AWS Architecture (Production Reference)
 
-```mermaid
-flowchart LR
-  subgraph Edge
-    U[User] -->|HTTPS| CF[CloudFront + WAF]
-  end
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/f77b95ca-7147-4ce1-9d32-ac7978e17de0" />
 
-  subgraph Compute["Private Subnets (Multi-AZ)"]
-    CF --> ALB[ALB]
-    ALB --> ECS[ECS Fargate<br/>FastAPI]
-    ECS --> Cache[ElastiCache]
-    ECS --> SQS[SQS]
-  end
-
-  subgraph Data["Data Layer"]
-    ECS --> RDS[(RDS Postgres)]
-    ECS --> OpenSearch[(OpenSearch<br/>Vector DB)]
-    ECS --> S3[(S3<br/>PDFs)]
-  end
-
-  subgraph AI["AI Layer"]
-    SQS --> Worker[Worker Pool]
-    Worker --> GPU[EC2 GPU<br/>Ollama + Qwen]
-  end
-
-  subgraph Observability
-    ECS --> CW[CloudWatch]
-    Worker --> CW
-  end
-```
 
 **Key decisions:**
 - ALB is the only public ingress; all compute in private subnets
@@ -319,5 +292,4 @@ License not yet specified. Contact maintainers before redistribution.
 - [Ollama](https://ollama.ai) for local LLM inference
 - [FAISS](https://github.com/facebookresearch/faiss) for vector search
 - [Sentence Transformers](https://sbert.net) for embeddings and reranking
-# Focus-DOGUSHACKATHON
 # Focus-DOGUSHACKATHON
