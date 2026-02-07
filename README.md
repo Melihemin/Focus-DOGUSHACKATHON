@@ -320,3 +320,4 @@ License not yet specified. Contact maintainers before redistribution.
 - [FAISS](https://github.com/facebookresearch/faiss) for vector search
 - [Sentence Transformers](https://sbert.net) for embeddings and reranking
 # Focus-DOGUSHACKATHON
+# Focus-DOGUSHACKATHON

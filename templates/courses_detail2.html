@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FocusFlow Pure Text Lesson Player</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Lora", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .prose-content {
+            @apply text-[#374151] dark:text-[#d1d5db] leading-relaxed;
+        }
+        .prose-content h2 {
+            @apply text-3xl font-bold mt-12 mb-6 text-[#111318] dark:text-white;
+        }
+        .prose-content h3 {
+            @apply text-2xl font-semibold mt-8 mb-4 text-[#111318] dark:text-white;
+        }
+        .prose-content p {
+            @apply mb-6 text-xl font-serif;
+        }
+        .prose-content ul {
+            @apply list-disc pl-8 mb-8 space-y-3;
+        }
+        .prose-content li {
+            @apply text-xl font-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dbdfe6;
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2d323a;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-background-dark font-display text-[#111318] dark:text-white">
+<div class="relative flex min-h-screen flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#dbdfe6] dark:border-[#2d323a] bg-white dark:bg-[#1a212f] px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-6">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z" fill="currentColor"></path>
+<path clip-rule="evenodd" d="M39.998 12.236C39.9944 12.2537 39.9875 12.2845 39.9748 12.3294C39.9436 12.4399 39.8949 12.5741 39.8346 12.7175C39.8168 12.7597 39.7989 12.8007 39.7813 12.8398C38.5103 13.7113 35.9788 14.9393 33.7095 15.4811C30.9875 16.131 27.6413 16.5217 24 16.5217C20.3587 16.5217 17.0125 16.131 14.2905 15.4811C12.0012 14.9346 9.44505 13.6897 8.18538 12.8168C8.17384 12.7925 8.16216 12.767 8.15052 12.7408C8.09919 12.6249 8.05721 12.5114 8.02977 12.411C8.00356 12.3152 8.00039 12.2667 8.00004 12.2612C8.00004 12.261 8 12.2607 8.00004 12.2612C8.00004 12.2359 8.0104 11.9233 8.68485 11.3686C9.34546 10.8254 10.4222 10.2469 11.9291 9.72276C14.9242 8.68098 19.1919 8 24 8C28.8081 8 33.0758 8.68098 36.0709 9.72276C37.5778 10.2469 38.6545 10.8254 39.3151 11.3686C39.9006 11.8501 39.9857 12.1489 39.998 12.236ZM4.95178 15.2312L21.4543 41.6973C22.6288 43.5809 25.3712 43.5809 26.5457 41.6973L43.0534 15.223C43.0709 15.1948 43.0878 15.1662 43.104 15.1371L41.3563 14.1648C43.104 15.1371 43.1038 15.1374 43.104 15.1371L43.1051 15.135L43.1065 15.1325L43.1101 15.1261L43.1199 15.1082C43.1276 15.094 43.1377 15.0754 43.1497 15.0527C43.1738 15.0075 43.2062 14.9455 43.244 14.8701C43.319 14.7208 43.4196 14.511 43.5217 14.2683C43.6901 13.8679 44 13.0689 44 12.2609C44 10.5573 43.003 9.22254 41.8558 8.2791C40.6947 7.32427 39.1354 6.55361 37.385 5.94477C33.8654 4.72057 29.133 4 24 4C18.867 4 14.1346 4.72057 10.615 5.94478C8.86463 6.55361 7.30529 7.32428 6.14419 8.27911C4.99695 9.22255 3.99999 10.5573 3.99999 12.2609C3.99999 13.1275 4.29264 13.9078 4.49321 14.3607C4.60375 14.6102 4.71348 14.8196 4.79687 14.9689C4.83898 15.0444 4.87547 15.1065 4.9035 15.1529C4.91754 15.1762 4.92954 15.1957 4.93916 15.2111L4.94662 15.223L4.95178 15.2312ZM35.9868 18.996L24 38.22L12.0131 18.996C12.4661 19.1391 12.9179 19.2658 13.3617 19.3718C16.4281 20.1039 20.0901 20.5217 24 20.5217C27.9099 20.5217 31.5719 20.1039 34.6383 19.3718C35.082 19.2658 35.5339 19.1391 35.9868 18.996Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-[-0.015em] text-[#111318] dark:text-white">FocusFlow</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden">
+<div class="text-[#616f89] flex border-none bg-background-light dark:bg-[#1a212f] items-center justify-center pl-4 border-r-0">
+<span class="material-symbols-outlined" style="font-size: 20px;">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-background-light dark:bg-[#1a212f] text-[#111318] dark:text-white focus:outline-0 focus:ring-0 h-full placeholder:text-[#616f89] px-4 pl-2 text-sm font-normal" placeholder="Search courses..."/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<nav class="flex items-center gap-6">
+<a class="text-[#111318] dark:text-[#a0aab8] text-sm font-medium hover:text-primary transition-colors" href="#">My Courses</a>
+<a class="text-[#111318] dark:text-[#a0aab8] text-sm font-medium hover:text-primary transition-colors" href="#">Explore</a>
+<a class="text-[#111318] dark:text-[#a0aab8] text-sm font-medium hover:text-primary transition-colors" href="#">Certificates</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-background-light dark:bg-[#1a212f] text-[#111318] dark:text-white hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-background-light dark:bg-[#1a212f] text-[#111318] dark:text-white hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCN6zuHY0LOL1B1XoP2soC4wXkAZfpamBDnmt8NsGPDJmsTG0SFqx18nfPLiOEOL08GkchJ6g8nfuIPy0vAwKTSzlwE_a5s39WLcGqeyCKFAShqEu-YBGcPSuxIAatAAn5u6qGiil8PUhDTbMVcx2en2Oxr2HAqyimVwkNMsjMtMWyHOUMxW9fMypzeOK8JZoAbS_TTNrabgrHT-lTN6eN7jv-o_WuMGAjJpu7Jn6_Qimci7fBeu5QjhpOe9XpdY0_GCqxpy4EUrIZm");'></div>
+</div>
+</header>
+<main class="flex-1 flex flex-row overflow-hidden max-w-[1400px] mx-auto w-full px-4 lg:px-8 py-10 gap-12">
+<div class="flex-1 flex flex-col min-w-0">
+<div class="flex flex-wrap items-center gap-2 mb-4">
+<a class="text-[#616f89] text-xs font-medium hover:text-primary transition-colors uppercase tracking-wider" href="#">Graphic Design Mastery</a>
+<span class="text-[#616f89] text-xs">/</span>
+<a class="text-[#616f89] text-xs font-medium hover:text-primary transition-colors uppercase tracking-wider" href="#">Module 2: Layout &amp; Composition</a>
+<span class="text-[#616f89] text-xs">/</span>
+<span class="text-primary text-xs font-bold uppercase tracking-wider">Lesson 4: Rule of Thirds</span>
+</div>
+<div class="flex flex-col pb-8 border-b border-[#dbdfe6] dark:border-[#2d323a]">
+<h1 class="text-5xl font-extrabold text-[#111318] dark:text-white mb-6 leading-[1.1]">Lesson 4: Mastering the Rule of Thirds</h1>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-6 text-sm text-[#616f89] font-medium">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-lg">schedule</span> 15 min read</span>
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-lg">menu_book</span> Text-Based Lesson</span>
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-lg">person</span> By Prof. Julian Vance</span>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-background-light dark:bg-[#1a212f] text-[#616f89] hover:text-primary transition-colors border border-[#dbdfe6] dark:border-[#2d323a]">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-background-light dark:bg-[#1a212f] text-[#616f89] hover:text-primary transition-colors border border-[#dbdfe6] dark:border-[#2d323a]">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex gap-8 border-b border-[#dbdfe6] dark:border-[#2d323a] mb-12 sticky top-[64px] bg-white/95 dark:bg-background-dark/95 backdrop-blur-sm z-40">
+<a class="border-b-2 border-primary text-primary px-1 py-5 font-bold text-sm" href="#">Overview &amp; Reading</a>
+<a class="text-[#616f89] hover:text-[#111318] dark:hover:text-white px-1 py-5 font-bold text-sm transition-colors" href="#">Resources</a>
+<a class="text-[#616f89] hover:text-[#111318] dark:hover:text-white px-1 py-5 font-bold text-sm transition-colors" href="#">Notes</a>
+<a class="text-[#616f89] hover:text-[#111318] dark:hover:text-white px-1 py-5 font-bold text-sm transition-colors" href="#">Discussion</a>
+</div>
+<article class="prose-content max-w-[800px] pb-20">
+<p class="text-2xl italic text-[#4b5563] dark:text-[#a0aab8] mb-12 border-l-4 border-primary/30 pl-8 leading-relaxed">
+                    "The Rule of Thirds is not just a guideline for photographers; it's a foundational principle that governs how human eyes consume visual information and interpret spatial balance."
+                </p>
+<h2>Understanding the Grid</h2>
+<p>
+                    The Rule of Thirds involves mentally dividing your image or canvas into nine equal parts using two equally spaced horizontal lines and two equally spaced vertical lines. This creates a 3x3 grid that helps you determine where to place the most important elements of your design.
+                </p>
+<p>
+                    By breaking the composition down into these nine zones, you move away from the "center-weighted" instinct that often leads to static or uninteresting layouts. Instead, you create a path for the eye to follow, creating movement and narrative within a single frame.
+                </p>
+<div class="my-12 p-8 bg-blue-50 dark:bg-primary/5 rounded-2xl border-l-8 border-primary shadow-sm">
+<h4 class="font-bold text-primary mb-3 flex items-center gap-2 text-lg">
+<span class="material-symbols-outlined">lightbulb</span>
+                        Instructor's Insight:
+                    </h4>
+<p class="text-lg text-[#374151] dark:text-[#a0aab8] font-sans m-0 leading-relaxed">
+                        Most professional design software like Adobe Illustrator and Photoshop have built-in grid tools that can be configured to show thirds automatically. Before you even place your first shape, set your grid to 3x3. It will fundamentally change how you perceive the white space in your layout.
+                    </p>
+</div>
+<h3>The Power of the Intersections</h3>
+<p>
+                    The four points where these lines intersect are known as <strong>power points</strong>. Research in visual psychology suggests that the human eye is naturally drawn to these intersections rather than the center of the frame. 
+                </p>
+<ul>
+<li><strong>Visual Balance:</strong> Placing elements off-center creates a more pleasing balance compared to perfectly symmetrical designs which can feel rigid.</li>
+<li><strong>Creating Tension:</strong> A slight imbalance can lead to a more dynamic and engaging composition that holds the viewer's attention longer.</li>
+<li><strong>Focusing Attention:</strong> By aligning subjects with the grid lines, you direct the viewer's journey through the design, leading them toward your call to action.</li>
+</ul>
+<h2>Practical Application in Layout Design</h2>
+<p>
+                    In web design and graphic layouts, the Rule of Thirds can be applied to align text blocks, call-to-action buttons, and hero images. For instance, placing a headline on the top-left intersection ensures it's one of the first things a user sees, following the natural F-pattern of reading.
+                </p>
+<div class="grid grid-cols-1 gap-10 my-12">
+<div class="rounded-2xl overflow-hidden border border-[#dbdfe6] dark:border-[#2d323a] shadow-xl">
+<img alt="Example of rule of thirds in photography" class="w-full h-auto object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmFlv2TOobICY4XOabk-xYmkX7vOOJ02V3x8I67NggqLWHpJlJPL2f667f6cJen4xx7hoZHddgihCmn6ee3sTexjE8k4Gy1006QNJWEr9Xs3dLOi7BfSdq6v3ACDAqOcVEBosRKZduYufgC34RZ-KNKRFB5YnG1SHruMixBL5aq7MivJ_djniHypd0Q6IUJmX45ZYFL9aGq7VuYbhRRh7_NKy6lbXvDR9Jb9ncxjSW0XNBq_ADwhD-dstZRlam1xp-f2aYL8ZzHJO4"/>
+<div class="p-6 bg-background-light dark:bg-[#1a212f]">
+<h4 class="font-bold mb-2 text-lg">Case Study: Hero Section Analysis</h4>
+<p class="text-base font-sans text-[#616f89] mb-0">Notice how the primary subject is aligned with the right vertical third, while the supporting text occupies the left two-thirds. This creates a breathing space that feels intentional, sophisticated, and professional.</p>
+</div>
+</div>
+</div>
+<h3>Common Mistakes to Avoid</h3>
+<p>
+                    While the rule is powerful, over-relying on it can lead to predictable designs. Here's what to watch out for to ensure your work remains fresh and impactful:
+                </p>
+<ul class="list-none space-y-6 pl-0">
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-red-500 mt-1 flex-shrink-0">error</span>
+<span><strong>Ignoring Content Hierarchy:</strong> Don't force an element onto a grid line if it breaks the logical flow of information. The content's meaning always trumps the grid's geometry.</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-red-500 mt-1 flex-shrink-0">error</span>
+<span><strong>Crowding the Intersections:</strong> Putting too many competing elements on different power points can confuse the viewer. Choose one primary focal point and let the others serve as supporting anchors.</span>
+</li>
+</ul>
+</article>
+<div class="flex justify-between items-center py-10 border-t border-[#dbdfe6] dark:border-[#2d323a] mb-20">
+<button class="flex items-center gap-3 px-6 py-3 rounded-xl border-2 border-[#dbdfe6] dark:border-[#2d323a] text-[#616f89] font-bold text-base hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined text-xl">arrow_back</span>
+                    Previous Lesson
+                </button>
+<button class="flex items-center gap-3 px-10 py-3 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                    Next Lesson
+                    <span class="material-symbols-outlined text-xl">arrow_forward</span>
+</button>
+</div>
+</div>
+<aside class="w-80 hidden lg:block">
+<div class="bg-white dark:bg-[#1a212f] rounded-2xl border border-[#dbdfe6] dark:border-[#2d323a] shadow-sm flex flex-col h-[calc(100vh-140px)] sticky top-[100px]">
+<div class="p-5 border-b border-[#dbdfe6] dark:border-[#2d323a] flex items-center justify-between">
+<h2 class="font-bold text-base">Course Content</h2>
+<span class="text-xs font-semibold text-[#616f89] bg-background-light dark:bg-background-dark px-2 py-1 rounded">45% Complete</span>
+</div>
+<div class="p-5 bg-background-light dark:bg-background-dark/50">
+<div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full">
+<div class="bg-primary h-1.5 rounded-full" style="width: 45%;"></div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<div class="border-b border-[#dbdfe6] dark:border-[#2d323a]">
+<button class="w-full flex items-center justify-between p-5 bg-background-light dark:bg-[#2d323a]/30 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="text-xs font-bold uppercase tracking-wider text-[#616f89]">Module 1: Introduction</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<div class="px-2 pb-2">
+<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-background-light dark:hover:bg-[#2d323a]/50 cursor-pointer group">
+<span class="material-symbols-outlined text-green-500 text-xl font-bold">check_circle</span>
+<div class="flex-1">
+<p class="text-sm font-medium">1. Welcome to the Course</p>
+<p class="text-xs text-[#616f89]">Text • 5 min</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-background-light dark:hover:bg-[#2d323a]/50 cursor-pointer group">
+<span class="material-symbols-outlined text-green-500 text-xl font-bold">check_circle</span>
+<div class="flex-1">
+<p class="text-sm font-medium">2. Setup Your Workspace</p>
+<p class="text-xs text-[#616f89]">Video • 12:40</p>
+</div>
+</div>
+</div>
+</div>
+<div>
+<button class="w-full flex items-center justify-between p-5 bg-background-light dark:bg-[#2d323a]/30 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="text-xs font-bold uppercase tracking-wider text-[#111318] dark:text-white">Module 2: Layouts</span>
+<span class="material-symbols-outlined text-sm">expand_less</span>
+</button>
+<div class="px-2 pb-2">
+<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-background-light dark:hover:bg-[#2d323a]/50 cursor-pointer group">
+<span class="material-symbols-outlined text-green-500 text-xl font-bold">check_circle</span>
+<div class="flex-1">
+<p class="text-sm font-medium">3. Basic Proportions</p>
+<p class="text-xs text-[#616f89]">Video • 18:22</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border-l-4 border-primary">
+<div class="size-6 flex items-center justify-center">
+<div class="size-2 bg-primary rounded-full animate-pulse"></div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<p class="text-sm font-bold text-primary">4. Rule of Thirds</p>
+<span class="px-1.5 py-0.5 rounded bg-primary text-[10px] text-white font-bold tracking-tighter">READING</span>
+</div>
+<p class="text-xs text-primary/70">Current Lesson</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-background-light dark:hover:bg-[#2d323a]/50 cursor-pointer group">
+<span class="material-symbols-outlined text-[#616f89] text-xl">play_circle</span>
+<div class="flex-1">
+<p class="text-sm font-medium">5. The Golden Ratio</p>
+<p class="text-xs text-[#616f89]">Video • 21:05</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-background-light dark:hover:bg-[#2d323a]/50 cursor-pointer group opacity-60">
+<span class="material-symbols-outlined text-[#616f89] text-xl">lock</span>
+<div class="flex-1">
+<p class="text-sm font-medium">6. Visual Hierarchy</p>
+<p class="text-xs text-[#616f89]">Video • 15:40</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-5 border-t border-[#dbdfe6] dark:border-[#2d323a]">
+<button class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 font-bold text-sm hover:bg-green-100 transition-colors">
+<span class="material-symbols-outlined text-lg">workspace_premium</span>
+                        Claim Certificate
+                    </button>
+</div>
+</div>
+</aside>
+</main>
+</div>
+
+</body></html>

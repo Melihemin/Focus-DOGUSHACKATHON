@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Course Detail</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2b6cee",
+                        "background-light": "#f9fafb",
+                        "background-dark": "#0f172a",
+                        "success": "#22c55e",
+                        "warning": "#f59e0b",
+                        "danger": "#ef4444"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        serif: ["Lora", "serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.375rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    keyframes: {
+                        pulse: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.7 } }
+                    },
+                    animation: {
+                        pulse: 'pulse 1s infinite'
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+
+        .prose {
+            font-family: "Lora", serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            font-family: "Inter", sans-serif;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #1f2937;
+        }
+        
+        .dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4, .dark .prose h5, .dark .prose h6 {
+            color: #f3f4f6;
+        }
+        
+        .prose h1 { font-size: 2.2em; }
+        .prose h2 { font-size: 1.8em; }
+        .prose h3 { font-size: 1.4em; }
+        
+        .prose p {
+            margin: 1.2em 0;
+            color: #374151;
+        }
+
+        .dark .prose p {
+            color: #d1d5db;
+        }
+
+        .prose code {
+            background: #f3f4f6;
+            color: #1f2937;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .dark .prose code {
+            background: #374151;
+            color: #f3f4f6;
+        }
+        
+        .prose pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 1em;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1em 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .focus-indicator { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 12px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display:flex; align-items:center; gap: 8px;}
+        .focus-good { background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; color: #22c55e; }
+        .focus-warning { background: rgba(245, 158, 11, 0.1); border: 2px solid #f59e0b; color: #f59e0b; }
+        .focus-alert { background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; color: #ef4444; animation: pulse 1s infinite; }
+        
+        #calibration-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(16, 28, 34, 0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .calibration-dot { position: absolute; width: 20px; height: 20px; background: #2b6cee; border-radius: 50%; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 0 20px rgba(43, 108, 238, 0.5); }
+        .calibration-dot:hover { transform: scale(1.2); }
+        .calibration-dot.clicked { background: #22c55e; animation: calibration-click 0.3s ease; }
+        @keyframes calibration-click { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1); } }
+        
+        /* Sidebar scrollbar */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .carbon-toast {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 1.25rem;
+            max-width: 340px;
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+            padding: 16px 18px;
+            z-index: 60;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .carbon-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .carbon-toast .carbon-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #14532d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .carbon-toast .carbon-body {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.45;
+        }
+        .carbon-toast .carbon-meta {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .carbon-toast .carbon-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .carbon-toast .carbon-total {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #475569;
+        }
+        .dark .carbon-toast {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-color: rgba(148, 163, 184, 0.25);
+            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.5);
+        }
+        .dark .carbon-toast .carbon-title {
+            color: #86efac;
+        }
+        .dark .carbon-toast .carbon-body,
+        .dark .carbon-toast .carbon-total {
+            color: #cbd5f5;
+        }
+        .dark .carbon-toast .carbon-meta {
+            color: #94a3b8;
+        }
+        @media (max-width: 640px) {
+            .carbon-toast {
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 min-h-screen">
+        <!-- Navbar -->
+        {% include 'navbar.html' %}
+
+        <!-- Header -->
+        <header class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">F</span>
+                        </div>
+                        <span class="font-bold text-lg text-gray-900 dark:text-white">FocusFlow</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button id="eye-tracking-toggle" class="flex items-center gap-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2.5 text-sm font-semibold transition-colors">
+                            <span class="material-symbols-outlined text-base">visibility</span>
+                            <span>Start Eye Tracking</span>
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">account_circle</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex">
+            <!-- Sidebar -->
+            <aside class="hidden lg:block w-80 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 sticky top-20 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+                <div class="p-6 space-y-6">
+                    <!-- Course Progress -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Course Progress</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-600 dark:text-gray-400">%45 Tamamlandı</span>
+                                <span class="text-gray-600 dark:text-gray-400">9/20</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                                <div class="bg-primary rounded-full h-2" style="width: 45%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lesson Modules -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Modüller</h3>
+                        <div class="space-y-1">
+                            <div class="p-2 rounded-lg bg-primary/5 border-l-2 border-primary">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Modül 1: Temel Kavramlar</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Şu anda açık 📍</p>
+                            </div>
+                            <div class="p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">✓ Modül 2: Uygulamalar</p>
+                            </div>
+                            <div class="p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer opacity-50">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">🔒 Modül 3: İleri Konular</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate -->
+                    <button class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-sm">
+                        Sertifikayı Al
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1">
+                <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
+                    <!-- Breadcrumb -->
+                    <nav class="mb-8">
+                        <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                            <li><a href="#" class="hover:text-primary">Courses</a></li>
+                            <li class="text-gray-400">/</li>
+                            <li><a href="#" class="hover:text-primary">Geometri 101</a></li>
+                            <li class="text-gray-400">/</li>
+                            <li class="text-gray-900 dark:text-gray-200 font-medium">{{ lesson.title }}</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Title & Metadata -->
+                    <div class="mb-8">
+                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ lesson.title }}</h1>
+                        <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">schedule</span>
+                                <span>10 dakika</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">local_library</span>
+                                <span>Classroom</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">person</span>
+                                <span>Dr. Ahmet Yılmaz</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Navigation -->
+                    <div class="mb-8 border-b border-gray-200 dark:border-gray-800">
+                        <div class="flex gap-8">
+                            <button id="tab-lesson" class="py-4 text-gray-900 dark:text-white font-semibold border-b-2 border-primary">Lesson</button>
+                            <button id="tab-resources" class="py-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border-b-2 border-transparent hover:border-gray-300">Resources</button>
+                        </div>
+                    </div>
+
+                    <!-- Content Section -->
+                    <section id="lesson-content" class="prose prose-invert max-w-none mb-12">
+                        <div class="text-gray-700 dark:text-gray-300 leading-relaxed" style="overflow-wrap: break-word; word-wrap: break-word;">
+                            {{ response | safe }}
+                        </div>
+                    </section>
+
+                    <!-- Resources Section -->
+                    <section id="resources-content" class="mb-12 hidden">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Resources</h2>
+                        
+                        <!-- Upload Section -->
+                        <div class="mb-8 p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                            <div class="flex items-center justify-center">
+                                <div class="text-center">
+                                    <span class="material-symbols-outlined text-4xl text-primary mb-3 block">cloud_upload</span>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">PDF Yükle</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Drag and drop PDF files or click</p>
+                                    <input id="pdf-upload" type="file" multiple accept=".pdf" class="hidden">
+                                    <button id="upload-btn" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-sm">
+                                        Select File
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="upload-progress" class="mt-4 hidden">
+                                <div class="text-sm text-gray-600 dark:text-gray-400 mb-2" id="upload-status">Yükleniyor...</div>
+                                <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+                                    <div id="upload-progress-bar" class="bg-primary h-2 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resources List -->
+                        <div id="resources-container" class="space-y-3">
+                            <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                                <span class="material-symbols-outlined animate-spin inline-block text-2xl">hourglass_empty</span>
+                                <p class="mt-2">Loading resources...</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Navigation & Submit -->
+                    <div class="border-t border-gray-200 dark:border-gray-800 pt-8 mt-12">
+                        <div class="flex items-center justify-between mb-8">
+                            <button class="flex items-center gap-2 text-primary hover:text-primary/80 font-semibold">
+                                <span class="material-symbols-outlined">arrow_back</span>
+                                Previous Lesson
+                            </button>
+                            <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-base">tab_move</span>
+                                    <span id="tab-switch-counter">Sekme Değiştirme: 0</span>
+                                </div>
+                            </div>
+                            <button class="flex items-center gap-2 text-primary hover:text-primary/80 font-semibold">
+                                Next Lesson
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </button>
+                        </div>
+                        <button id="quiz-submit-btn" class="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 font-semibold transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <span>Oturumu Tamamla ve Kaydet</span>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="focus-indicator" class="focus-indicator" style="display: none;"><span id="focus-text"></span></div>
+    <canvas id="gaze-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 998; display: none;"></canvas>
+    <video id="webcam" playsinline muted class="hidden"></video>
+    <div id="calibration-modal" style="display: none;">
+        <div class="bg-background-light dark:bg-background-dark rounded-xl p-8 text-center max-w-lg mx-4">
+            <h3 class="text-2xl font-bold mb-4">🎯 Eye Tracking Setup</h3>
+            <div id="calibration-area" class="fixed inset-0 bg-gray-200/50 dark:bg-gray-800/50" style="display: none;"></div>
+            <div id="setup-options">
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Choose a method to monitor focus.</p>
+                <div class="flex gap-4 justify-center">
+                    <button id="start-calibration" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2"><span class="material-symbols-outlined">videocam</span> Use Webcam</button>
+                    <button id="skip-calibration" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:opacity-80 flex items-center gap-2"><span class="material-symbols-outlined">mouse</span> Use Mouse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completion Popup -->
+    <div id="completion-popup" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-background-light dark:bg-background-dark rounded-xl p-10 max-w-4xl mx-4 text-center max-h-[70vh] overflow-y-auto">
+            <div class="text-5xl mb-4">✅</div>
+            <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Oturum Tamamlandı!</h2>
+            
+            <!-- Time Spent -->
+            <p class="text-gray-600 dark:text-gray-300 mb-6">
+                Harcadığınız Zaman: <span id="time-spent" class="font-semibold text-lg">0 dakika</span>
+            </p>
+            
+            <!-- Tab Switches -->
+            <div class="bg-orange-100 dark:bg-orange-900/30 rounded-lg p-3 mb-4">
+                <p class="text-gray-700 dark:text-gray-300">
+                    <span class="font-semibold">📱 Sekme Değiştirme:</span> <span id="tab-switches-display">0</span> kez
+                </p>
+            </div>
+            
+            <!-- Focus Statistics -->
+            <div class="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-6 mb-6 text-left">
+                <h3 class="font-bold text-gray-900 dark:text-white mb-4">Focus Statistics</h3>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-700 dark:text-gray-300">Good Focus:</span>
+                        <span class="font-semibold text-green-600 dark:text-green-400" id="stat-good">0s</span>
+                    </div>
+                    <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" id="stat-good-bar" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-gray-700 dark:text-gray-300">⚠️ Dikkat Dağınıklığı:</span>
+                        <span class="font-semibold text-yellow-600 dark:text-yellow-400" id="stat-warning">0s</span>
+                    </div>
+                    <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-yellow-500 h-2 rounded-full" id="stat-warning-bar" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-gray-700 dark:text-gray-300">Lost Focus:</span>
+                        <span class="font-semibold text-red-600 dark:text-red-400" id="stat-alert">0s</span>
+                    </div>
+                    <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full" id="stat-alert-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Focus Percentage -->
+            <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-4 mb-4">
+                <p class="text-lg font-semibold text-blue-900 dark:text-blue-200" id="focus-percentage">
+                    Focus Ratio: 0%
+                </p>
+            </div>
+            
+            <!-- Comparison with Previous Sessions -->
+            <div id="comparison-section" class="bg-purple-100 dark:bg-purple-900/30 rounded-lg p-4 mb-6 hidden">
+                <h4 class="font-bold text-purple-900 dark:text-purple-200 mb-3">📈 Önceki Sessionlarla Kıyaslama</h4>
+                <div id="comparison-content" class="text-sm text-purple-800 dark:text-purple-300">
+                    Yükleniyor...
+                </div>
+            </div>
+            
+            <!-- Evaluation -->
+            <div id="evaluation-message" class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">
+                Evaluation loading...
+            </div>
+            
+            <!-- Continue Button -->
+            <button id="continue-btn" class="w-full bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary/90 font-semibold transition-colors">
+                Devam Et
+            </button>
+        </div>
+    </div>
+
+
+</body>
+<script>
+    // --- POMODORO TIMER CODE ---
+    const timerLabel = document.querySelector("#pomodoro-timer p:nth-child(1)");
+    const timerDisplay = document.querySelector("#pomodoro-timer p:nth-child(2)");
+    const pausePlayButton = document.getElementById("pause-play-btn");
+    const pausePlayIcon = pausePlayButton ? pausePlayButton.querySelector("span") : null;
+    const restartButton = document.getElementById("restart-btn");
+
+    // Only initialize Pomodoro if elements exist
+    if (pausePlayButton && restartButton && timerLabel && timerDisplay) {
+        const workDuration = 25 * 60;
+        const breakDuration = 5 * 60;
+
+        let isWork = true;
+        let timeLeft = workDuration;
+        let isPaused = false;
+        let timerInterval = null;
+
+        function formatTime(seconds) {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(timeLeft);
+            timerLabel.textContent = `Pomodoro: ${isWork ? "Work" : "Break"}`;
+            pausePlayIcon.textContent = isPaused ? "play_arrow" : "pause";
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                } else {
+                    isWork = !isWork;
+                    timeLeft = isWork ? workDuration : breakDuration;
+                }
+                updateDisplay();
+            }, 1000);
+            isPaused = false;
+            updateDisplay();
+        }
+
+        function togglePausePlay() {
+            if (isPaused) startTimer();
+            else { clearInterval(timerInterval); isPaused = true; updateDisplay(); }
+        }
+
+        function restartTimer() {
+            clearInterval(timerInterval);
+            timeLeft = isWork ? workDuration : breakDuration;
+            startTimer();
+        }
+
+        pausePlayButton.addEventListener("click", togglePausePlay);
+        restartButton.addEventListener("click", restartTimer);
+
+        startTimer();
+    }
+    // --- POMODORO TIMER END ---
+    
+    // --- ADDED: EYE TRACKING ---
+    class EyeTracking {
+        constructor() {
+            this.isEnabled = false;
+            this.trackingMode = 'none';
+            this.focusArea = null;
+            this.focusStatus = 'good';
+            this.offFocusStartTime = null;
+            this.focusCheckInterval = null;
+            this.lastPrediction = null;
+            this.lastRawGaze = null;
+            this.isCalibrating = false;
+            this.calibrationSamples = [];
+            this.calibrationMap = { ax: 1, bx: 0, ay: 1, by: 0 };
+            this.animationFrame = null;
+            this.canvas = document.getElementById('gaze-canvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.video = document.getElementById('webcam');
+            this.camera = null;
+            this.faceMesh = null;
+            this.focusGoodTime = 0;
+            this.focusWarningTime = 0;
+            this.focusAlertTime = 0;
+            this.lastFocusStatusChangeTime = Date.now();
+            this.initializeElements();
+            this.bindEvents();
+            this.setupCanvas();
+            this.setupFaceMesh();
+        }
+
+        initializeElements() {
+            this.toggleButton = document.getElementById('eye-tracking-toggle');
+            this.focusIndicator = document.getElementById('focus-indicator');
+            this.focusText = document.getElementById('focus-text');
+            this.calibrationModal = document.getElementById('calibration-modal');
+            this.calibrationArea = document.getElementById('calibration-area');
+            this.startCalibrationBtn = document.getElementById('start-calibration');
+            this.skipCalibrationBtn = document.getElementById('skip-calibration');
+            this.setupOptions = document.getElementById('setup-options');
+            if (!this.toggleButton) console.error('Eye tracking button not found');
+        }
+
+        bindEvents() {
+            if (this.toggleButton) {
+                this.toggleButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (this.isEnabled) this.disable();
+                    else this.enable();
+                });
+            }
+
+            if (this.startCalibrationBtn) {
+                this.startCalibrationBtn.addEventListener('click', () => this.startCalibration());
+            }
+
+            if (this.skipCalibrationBtn) {
+                this.skipCalibrationBtn.addEventListener('click', () => this.skipCalibration());
+            }
+
+            window.addEventListener('resize', () => {
+                this.resizeCanvas();
+                this.updateFocusArea();
+            });
+
+            window.addEventListener('scroll', () => {
+                if (this.isEnabled) this.updateFocusArea();
+            });
+        }
+
+        setupCanvas() {
+            this.resizeCanvas();
+        }
+
+        resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            this.canvas.width = window.innerWidth * dpr;
+            this.canvas.height = window.innerHeight * dpr;
+            this.canvas.style.width = `${window.innerWidth}px`;
+            this.canvas.style.height = `${window.innerHeight}px`;
+            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+            this.ctx.scale(dpr, dpr);
+        }
+
+        setupFaceMesh() {
+            this.faceMesh = new FaceMesh({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+            });
+            this.faceMesh.setOptions({
+                maxNumFaces: 1,
+                refineLandmarks: true,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+            this.faceMesh.onResults((results) => this.handleFaceResults(results));
+        }
+
+        async enable() {
+            this.trackingMode = 'webcam';
+            this.isEnabled = true;
+            this.isCalibrating = true;
+            if (this.calibrationModal) this.calibrationModal.style.display = 'none';
+            this.focusIndicator.style.display = 'flex';
+            this.canvas.style.display = 'block';
+            this.updateButtonState('disable');
+            this.updateFocusArea();
+            this.startCamera();
+            this.focusCheckInterval = setInterval(() => this.checkFocus(), 500);
+            this.startRendering();
+            this.showCalibrationModal();
+            this.setFocusStatus('warning', 'Kalibrasyon bekleniyor');
+        }
+
+        disable() {
+            this.isEnabled = false;
+            this.focusIndicator.style.display = 'none';
+            this.canvas.style.display = 'none';
+            this.updateButtonState('enable');
+            if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+            if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+            this.stopCamera();
+            this.trackingMode = 'none';
+            this.isCalibrating = false;
+            this.hideCalibrationModal();
+        }
+
+        showCalibrationModal() {
+            if (!this.calibrationModal) return;
+            this.calibrationModal.style.display = 'flex';
+            if (this.calibrationArea) this.calibrationArea.style.display = 'none';
+            if (this.setupOptions) this.setupOptions.style.display = 'block';
+        }
+
+        hideCalibrationModal() {
+            if (this.calibrationModal) this.calibrationModal.style.display = 'none';
+        }
+
+        startCalibration() {
+            this.isCalibrating = true;
+            this.calibrationSamples = [];
+            if (this.setupOptions) this.setupOptions.style.display = 'none';
+            if (this.calibrationArea) {
+                this.calibrationArea.style.display = 'block';
+                this.calibrationArea.innerHTML = '';
+            }
+            this.setFocusStatus('warning', 'Kalibrasyon... Noktalara tıkla');
+            requestAnimationFrame(() => this.runCalibrationPoints());
+        }
+
+        skipCalibration() {
+            this.isCalibrating = false;
+            this.calibrationMap = { ax: 1, bx: 0, ay: 1, by: 0 };
+            this.hideCalibrationModal();
+            this.resetFocusTimers();
+            this.setFocusStatus('good', 'Eye Tracking 👁️');
+        }
+
+        runCalibrationPoints() {
+            const area = this.calibrationArea;
+            if (!area) return;
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const rows = 5;
+            const cols = 5;
+            const margin = 0.06;
+            const points = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const x = width * (margin + (c / (cols - 1)) * (1 - margin * 2));
+                    const y = height * (margin + (r / (rows - 1)) * (1 - margin * 2));
+                    points.push({ x, y });
+                }
+            }
+            let current = 0;
+
+            const showPoint = () => {
+                if (current >= points.length) {
+                    this.finishCalibration();
+                    return;
+                }
+
+                area.innerHTML = '';
+                const p = points[current];
+                const dot = document.createElement('div');
+                dot.className = 'calibration-dot';
+                dot.style.left = `${p.x - 10}px`;
+                dot.style.top = `${p.y - 10}px`;
+                area.appendChild(dot);
+
+                dot.addEventListener('click', (e) => {
+                    if (!this.lastRawGaze) {
+                        this.setFocusStatus('warning', 'Yüz algılanmıyor');
+                        return;
+                    }
+
+                    dot.classList.add('clicked');
+                    const target = {
+                        sx: e.clientX / window.innerWidth,
+                        sy: e.clientY / window.innerHeight
+                    };
+
+                    const samples = [];
+                    const sampleCount = 6;
+                    let taken = 0;
+                    const sampler = setInterval(() => {
+                        if (this.lastRawGaze) {
+                            samples.push({ gx: this.lastRawGaze.x, gy: this.lastRawGaze.y });
+                            taken++;
+                        }
+                        if (taken >= sampleCount) {
+                            clearInterval(sampler);
+                            if (samples.length > 0) {
+                                const avg = samples.reduce((acc, s) => ({
+                                    gx: acc.gx + s.gx,
+                                    gy: acc.gy + s.gy
+                                }), { gx: 0, gy: 0 });
+                                const mean = { gx: avg.gx / samples.length, gy: avg.gy / samples.length };
+                                this.calibrationSamples.push({ gx: mean.gx, gy: mean.gy, sx: target.sx, sy: target.sy });
+                            }
+                            setTimeout(() => {
+                                current++;
+                                showPoint();
+                            }, 200);
+                        }
+                    }, 60);
+                });
+            };
+
+            showPoint();
+        }
+
+        finishCalibration() {
+            this.calibrationMap = this.computeCalibrationMap(this.calibrationSamples);
+            this.isCalibrating = false;
+            this.hideCalibrationModal();
+            this.resetFocusTimers();
+            this.setFocusStatus('good', 'Kalibrasyon tamamlandı');
+        }
+
+        computeCalibrationMap(samples) {
+            const fit = (gKey, sKey) => {
+                const n = samples.length;
+                if (n < 2) return { a: 1, b: 0 };
+                let sumG = 0, sumS = 0;
+                for (const s of samples) { sumG += s[gKey]; sumS += s[sKey]; }
+                const meanG = sumG / n;
+                const meanS = sumS / n;
+                let varG = 0, cov = 0;
+                for (const s of samples) {
+                    const dg = s[gKey] - meanG;
+                    const ds = s[sKey] - meanS;
+                    varG += dg * dg;
+                    cov += dg * ds;
+                }
+                if (varG < 1e-6) return { a: 1, b: 0 };
+                const a = cov / varG;
+                const b = meanS - a * meanG;
+                return { a, b };
+            };
+
+            const xFit = fit('gx', 'sx');
+            const yFit = fit('gy', 'sy');
+            return { ax: xFit.a, bx: xFit.b, ay: yFit.a, by: yFit.b };
+        }
+
+        applyCalibration(gx, gy) {
+            const x = this.clamp(this.calibrationMap.ax * gx + this.calibrationMap.bx, 0, 1);
+            const y = this.clamp(this.calibrationMap.ay * gy + this.calibrationMap.by, 0, 1);
+            return { x, y };
+        }
+
+        updateButtonState(state) {
+            if (!this.toggleButton) return;
+            if (state === 'disable') {
+                this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility_off</span><span>Stop Eye Tracking</span>`;
+                this.toggleButton.className = 'flex items-center gap-2 rounded-lg bg-danger/10 text-danger hover:bg-danger/20 px-4 py-2.5 text-sm font-semibold transition-colors';
+            } else {
+                this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility</span><span>Start Eye Tracking</span>`;
+                this.toggleButton.className = 'flex items-center gap-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2.5 text-sm font-semibold transition-colors';
+            }
+        }
+
+        startCamera() {
+            if (!this.video) return;
+            if (this.camera) return;
+            this.camera = new Camera(this.video, {
+                onFrame: async () => {
+                    if (!this.isEnabled) return;
+                    await this.faceMesh.send({ image: this.video });
+                },
+                width: 640,
+                height: 480
+            });
+            this.camera.start();
+        }
+
+        stopCamera() {
+            if (this.camera) {
+                this.camera.stop();
+                this.camera = null;
+            }
+            if (this.video && this.video.srcObject) {
+                this.video.srcObject.getTracks().forEach((t) => t.stop());
+                this.video.srcObject = null;
+            }
+        }
+
+        handleFaceResults(results) {
+            if (!this.isEnabled) return;
+            const faces = results.multiFaceLandmarks;
+            if (!faces || faces.length === 0) {
+                this.lastPrediction = null;
+                this.lastRawGaze = null;
+                return;
+            }
+
+            const lm = faces[0];
+            const leftOuter = lm[33];
+            const leftInner = lm[133];
+            const rightOuter = lm[362];
+            const rightInner = lm[263];
+            const leftTop = lm[159];
+            const leftBottom = lm[145];
+            const rightTop = lm[386];
+            const rightBottom = lm[374];
+
+            const leftIris = this.averageLandmarks(lm, 468, 473);
+            const rightIris = this.averageLandmarks(lm, 474, 479);
+
+            const leftX = this.normalizeInRange(leftIris.x, leftInner.x, leftOuter.x);
+            const rightX = this.normalizeInRange(rightIris.x, rightInner.x, rightOuter.x);
+            const gazeX = this.clamp((leftX + rightX) / 2, 0, 1);
+
+            const leftY = this.normalizeInRange(leftIris.y, leftTop.y, leftBottom.y);
+            const rightY = this.normalizeInRange(rightIris.y, rightTop.y, rightBottom.y);
+            const gazeY = this.clamp((leftY + rightY) / 2, 0, 1);
+
+            this.lastRawGaze = { x: gazeX, y: gazeY };
+            const calibrated = this.applyCalibration(gazeX, gazeY);
+            this.lastPrediction = {
+                x: calibrated.x * window.innerWidth,
+                y: calibrated.y * window.innerHeight,
+                t: Date.now()
+            };
+        }
+
+        averageLandmarks(landmarks, start, end) {
+            let x = 0, y = 0, count = 0;
+            for (let i = start; i <= end; i++) {
+                if (!landmarks[i]) continue;
+                x += landmarks[i].x;
+                y += landmarks[i].y;
+                count++;
+            }
+            if (count === 0) return { x: 0.5, y: 0.5 };
+            return { x: x / count, y: y / count };
+        }
+
+        normalizeInRange(value, min, max) {
+            if (max - min === 0) return 0.5;
+            return (value - min) / (max - min);
+        }
+
+        clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        startRendering() {
+            if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+            const render = () => {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                if (this.isEnabled && this.lastPrediction) this.drawGaze();
+                this.animationFrame = requestAnimationFrame(render);
+            };
+            this.animationFrame = requestAnimationFrame(render);
+        }
+
+        drawGaze() {
+            const p = this.lastPrediction;
+            if (!p) return;
+            this.ctx.fillStyle = 'rgba(19, 164, 236, 0.8)';
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, 7, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+
+        updateFocusArea() {
+            const mainElement = document.querySelector('main');
+            if (!mainElement) return;
+            const rect = mainElement.getBoundingClientRect();
+            this.focusArea = {
+                left: rect.left,
+                top: rect.top,
+                right: rect.right,
+                bottom: rect.bottom
+            };
+        }
+
+        checkFocus() {
+            if (!this.isEnabled || !this.focusArea) return;
+            if (this.isCalibrating) return;
+            const p = this.lastPrediction;
+            if (!p || Date.now() - p.t > 1500) {
+                this.setFocusStatus('warning', 'Yüz algılanmıyor');
+                return;
+            }
+
+            const isFocused = (p.x >= this.focusArea.left && p.x <= this.focusArea.right &&
+                p.y >= this.focusArea.top && p.y <= this.focusArea.bottom);
+
+            if (isFocused) {
+                this.setFocusStatus('good', 'Focused');
+                this.offFocusStartTime = null;
+            } else {
+                if (!this.offFocusStartTime) this.offFocusStartTime = Date.now();
+                if (Date.now() - this.offFocusStartTime > 3000) {
+                    this.setFocusStatus('alert', 'Focus Lost');
+                } else {
+                    this.setFocusStatus('warning', 'Dikkat Dağınıklığı');
+                }
+            }
+        }
+
+        setFocusStatus(status, message) {
+            const now = Date.now();
+            const timeDelta = now - this.lastFocusStatusChangeTime;
+
+            if (this.focusStatus === 'good') this.focusGoodTime += timeDelta;
+            else if (this.focusStatus === 'warning') this.focusWarningTime += timeDelta;
+            else if (this.focusStatus === 'alert') this.focusAlertTime += timeDelta;
+
+            this.focusStatus = status;
+            this.lastFocusStatusChangeTime = now;
+
+            if (this.focusIndicator) this.focusIndicator.className = `focus-indicator focus-${status}`;
+            if (this.focusText) this.focusText.textContent = message;
+        }
+
+        finalizeFocusTracking() {
+            if (!this.isEnabled) return;
+            const now = Date.now();
+            const timeDelta = now - this.lastFocusStatusChangeTime;
+
+            if (this.focusStatus === 'good') this.focusGoodTime += timeDelta;
+            else if (this.focusStatus === 'warning') this.focusWarningTime += timeDelta;
+            else if (this.focusStatus === 'alert') this.focusAlertTime += timeDelta;
+        }
+
+        resetFocusTimers() {
+            this.focusGoodTime = 0;
+            this.focusWarningTime = 0;
+            this.focusAlertTime = 0;
+            this.lastFocusStatusChangeTime = Date.now();
+        }
+    }
+    
+    // Initialize eye tracking after page loads
+    const eyeTracking = new EyeTracking();
+    console.log('Eye tracking initialized:', eyeTracking.toggleButton ? 'Button found' : 'Button NOT found');
+    console.log('Eye tracking status:', eyeTracking.isEnabled);
+    
+    // --- ADDED: TAB SWITCH COUNTER ---
+    const tabSwitchCounterElement = document.getElementById('tab-switch-counter');
+    let tabSwitchCount = 0;
+
+    function handleVisibilityChange() {
+        if (document.hidden) {
+            tabSwitchCount++;
+            if (tabSwitchCounterElement) {
+                tabSwitchCounterElement.textContent = `Sekme Değiştirme: ${tabSwitchCount}`;
+            }
+        }
+    }
+    
+    if (tabSwitchCounterElement) {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    // --- MODIFIED: QUIZ AND POPUP CODE ---
+    const pageLoadTime = new Date();
+    const quizSubmitButton = document.getElementById('quiz-submit-btn');
+    const completionPopup = document.getElementById('completion-popup');
+    const timeSpentElement = document.getElementById('time-spent');
+    const continueButton = document.getElementById('continue-btn');
+
+    function formatTimeSpent(ms) {
+        const totalSeconds = Math.round(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        let result = "";
+        if (minutes > 0) result += `${minutes} dakika`;
+        if (seconds > 0) { if (minutes > 0) result += " "; result += `${seconds} saniye`; }
+        return result === "" ? "1 saniyeden az" : result;
+    }
+
+    if (quizSubmitButton) {
+        console.log('✅ Quiz submit button found and listener attached');
+        quizSubmitButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+            console.log('🔴 SUBMIT BUTTON CLICKED!');
+
+            // Stop trackers
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            
+            console.log('📊 Eye tracking state before finalization:', {
+                isEnabled: eyeTracking.isEnabled,
+                trackingMode: eyeTracking.trackingMode,
+                focusGoodTime: eyeTracking.focusGoodTime,
+                focusWarningTime: eyeTracking.focusWarningTime,
+                focusAlertTime: eyeTracking.focusAlertTime
+            });
+            
+            // Save tracking mode BEFORE disabling
+            const trackingModeUsed = eyeTracking.trackingMode;
+            
+            if (eyeTracking.isEnabled) {
+                // Finalize focus time tracking before disabling
+                eyeTracking.finalizeFocusTracking();
+                eyeTracking.disable();
+            }
+
+            const completionTime = new Date();
+            const timeDifference = completionTime - pageLoadTime;
+            if (timeSpentElement) {
+                timeSpentElement.textContent = formatTimeSpent(timeDifference);
+            }
+            
+            console.log('📊 Eye tracking state after finalization:', {
+                isEnabled: eyeTracking.isEnabled,
+                trackingMode: eyeTracking.trackingMode,
+                focusGoodTime: eyeTracking.focusGoodTime,
+                focusWarningTime: eyeTracking.focusWarningTime,
+                focusAlertTime: eyeTracking.focusAlertTime
+            });
+            
+            // Calculate focus statistics
+            const goodSeconds = eyeTracking.focusGoodTime / 1000;
+            const warningSeconds = eyeTracking.focusWarningTime / 1000;
+            const alertSeconds = eyeTracking.focusAlertTime / 1000;
+            const totalSeconds = goodSeconds + warningSeconds + alertSeconds;
+            
+            const goodPercent = totalSeconds > 0 ? Math.round((goodSeconds / totalSeconds) * 100) : 0;
+            const warningPercent = totalSeconds > 0 ? Math.round((warningSeconds / totalSeconds) * 100) : 0;
+            const alertPercent = totalSeconds > 0 ? Math.round((alertSeconds / totalSeconds) * 100) : 0;
+            
+            console.log('📈 Focus Statistics:', { goodPercent, warningPercent, alertPercent, totalSeconds });
+            
+            // Update UI with statistics
+            document.getElementById('stat-good').textContent = Math.round(goodSeconds) + 's';
+            document.getElementById('stat-warning').textContent = Math.round(warningSeconds) + 's';
+            document.getElementById('stat-alert').textContent = Math.round(alertSeconds) + 's';
+            
+            document.getElementById('stat-good-bar').style.width = goodPercent + '%';
+            document.getElementById('stat-warning-bar').style.width = warningPercent + '%';
+            document.getElementById('stat-alert-bar').style.width = alertPercent + '%';
+            
+            document.getElementById('focus-percentage').textContent = `Odak Oranı: %${goodPercent}`;
+            document.getElementById('tab-switches-display').textContent = tabSwitchCount;
+            
+            // Fetch previous sessions for comparison
+            try {
+                const courseId = {{ course.id }};
+                const response = await fetch(`/edu/user-sessions?course_id=${courseId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const sessions = data.sessions || [];
+                    
+                    if (sessions.length > 0) {
+                        // Calculate average focus percentage from previous sessions
+                        const avgFocusPercent = Math.round(
+                            sessions.reduce((sum, s) => {
+                                const total = (s.focus_status_good || 0) + (s.focus_status_warning || 0) + (s.focus_status_alert || 0);
+                                return sum + (total > 0 ? ((s.focus_status_good || 0) / total) * 100 : 0);
+                            }, 0) / sessions.length
+                        );
+                        
+                        const avgTabSwitches = Math.round(
+                            sessions.reduce((sum, s) => sum + (s.tab_switches || 0), 0) / sessions.length
+                        );
+                        
+                        const diff = goodPercent - avgFocusPercent;
+                        const tabDiff = tabSwitchCount - avgTabSwitches;
+                        const trend = diff >= 5 ? '📈 İyiye gidiyor!' : diff <= -5 ? '📉 Kötüye gidiyor!' : '→ Sabit';
+                        const tabTrend = tabDiff <= -2 ? '✅ Daha az sekme değişimi' : tabDiff >= 2 ? '⚠️ Daha fazla sekme değişimi' : '→ Benzer seviye';
+                        
+                        const comparisonHTML = `
+                            <div class="space-y-2">
+                                <p><strong>📊 Odak Oranı:</strong> Bu oturum: %${goodPercent} vs Ortalama: %${avgFocusPercent} <span class="text-lg">${trend}</span></p>
+                                <p><strong>📱 Sekme Değişimi:</strong> Bu oturum: ${tabSwitchCount}x vs Ortalama: ${avgTabSwitches}x <span class="text-lg">${tabTrend}</span></p>
+                                <p class="text-xs mt-3">Toplam ${sessions.length} önceki oturum ile karşılaştırma yapıldı.</p>
+                            </div>
+                        `;
+                        
+                        document.getElementById('comparison-section').classList.remove('hidden');
+                        document.getElementById('comparison-content').innerHTML = comparisonHTML;
+                        
+                        console.log('📊 Comparison:', { avgFocusPercent, avgTabSwitches, diff, tabDiff });
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Could not fetch previous sessions:', error);
+            }
+            
+            // Generate evaluation message
+            let evaluation = '';
+            if (goodPercent >= 80) {
+                evaluation = `🌟 <strong>Harika!</strong> %${goodPercent} odak oranı ile çok iyi bir performans gösterdiniz. Sekme değişimi (${tabSwitchCount}x) de makul seviyede. Bu seviyeyi korumanız önerilir.`;
+            } else if (goodPercent >= 60) {
+                evaluation = `✅ <strong>İyi Çalışma!</strong> %${goodPercent} odak oranı makul seviyede. Ancak dikkat dağınıklığı (%${warningPercent + alertPercent}%) azaltılabilir. Sekme değişimini azaltmaya çalışın (${tabSwitchCount}x).`;
+            } else if (goodPercent >= 40) {
+                evaluation = `⚠️ <strong>Dikkat Gerekli!</strong> %${goodPercent} odak oranı düşük. Sekme değişimi (${tabSwitchCount}x) oldukça yüksek. Mobil cihazı kapat, bildirimleri kapat ve daha az sekme açık tutmaya çalışın.`;
+            } else {
+                evaluation = `❌ <strong>Çok Düşük Odak!</strong> Yalnızca %${goodPercent} odak oranı ile çalışmanız verimli değil. Sekme değişimi (${tabSwitchCount}x) kontrol dışında. Lütfen dış etkenler ortadan kaldırarak tekrar deneyin.`;
+            }
+            
+            document.getElementById('evaluation-message').innerHTML = evaluation;
+            
+            // Save eye tracking session data to database
+            if (trackingModeUsed !== 'none') {
+                console.log('📥 Saving eye tracking session...', {
+                    mode: trackingModeUsed,
+                    duration: Math.round(timeDifference / 1000) + 's',
+                    tabSwitches: tabSwitchCount
+                });
+                await saveEyeTrackingSession(timeDifference, tabSwitchCount, eyeTracking);
+            } else {
+                console.warn('⚠️ Tracking mode is "none" - data not saved');
+            }
+            
+            if (completionPopup) {
+                completionPopup.classList.remove('hidden');
+            }
+        });
+    } else {
+        console.error('❌ Quiz submit button NOT found!');
+    }
+
+    // Function to save eye tracking session data (works for both webcam and mouse tracking)
+    async function saveEyeTrackingSession(totalDuration, tabSwitches, eyeTrackingObj) {
+        const courseId = {{ course.id }};
+        const completionTime = new Date();
+        
+        console.log('🔍 Debug - eyeTrackingObj:', eyeTrackingObj);
+        console.log('🔍 Debug - Course ID:', courseId);
+        
+        // Convert times to seconds
+        const focusGoodSeconds = Math.round((eyeTrackingObj.focusGoodTime || 0) / 1000);
+        const focusWarningSeconds = Math.round((eyeTrackingObj.focusWarningTime || 0) / 1000);
+        const focusAlertSeconds = Math.round((eyeTrackingObj.focusAlertTime || 0) / 1000);
+        const totalDurationSeconds = Math.round(totalDuration / 1000);
+        
+        const trackingData = {
+            course_id: courseId,
+            tracking_mode: eyeTrackingObj.trackingMode, // 'webcam' or 'mouse'
+            total_duration: totalDurationSeconds,
+            tab_switches: tabSwitches,
+            focus_status_good: focusGoodSeconds,
+            focus_status_warning: focusWarningSeconds,
+            focus_status_alert: focusAlertSeconds,
+            session_data: JSON.stringify({
+                tracking_mode_used: eyeTrackingObj.trackingMode,
+                page_load_time: pageLoadTime.toISOString(),
+                session_end_time: completionTime.toISOString(),
+                final_focus_status: eyeTrackingObj.focusStatus,
+                focus_breakdown: {
+                    good_seconds: focusGoodSeconds,
+                    warning_seconds: focusWarningSeconds,
+                    alert_seconds: focusAlertSeconds,
+                    total_seconds: totalDurationSeconds
+                }
+            })
+        };
+        
+        console.log('📤 Sending tracking data:', trackingData);
+        console.log('📋 JSON payload:', JSON.stringify(trackingData, null, 2));
+        
+        try {
+            console.log('🌐 Making fetch request to /edu/save-eye-tracking...');
+            const response = await fetch('/edu/save-eye-tracking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(trackingData)
+            });
+            
+            console.log('📡 Response status:', response.status, response.statusText);
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('✅ Eye tracking session saved successfully!');
+                console.log('🔢 Session ID:', result.session_id);
+                console.log('📊 Tracking Summary:', result.tracking_data);
+                console.log('🎯 Tracking Mode:', trackingData.tracking_mode === 'mouse' ? '🖱️ Mouse' : '👁️ Webcam');
+            } else {
+                const errorText = await response.text();
+                console.error('❌ Failed to save. Status:', response.status);
+                console.error('❌ Response body:', errorText);
+                try {
+                    const error = JSON.parse(errorText);
+                    console.error('❌ Error detail:', error.detail || error);
+                } catch (e) {
+                    console.error('❌ Raw response:', errorText);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Network/Fetch error:', error);
+            console.error('❌ Error stack:', error.stack);
+        }
+    }
+
+    if (continueButton) {
+        continueButton.addEventListener('click', () => {
+            completionPopup.classList.add('hidden');
+        });
+    }
+
+    // --- ADDED: DYNAMIC RESOURCES LOADING ---
+    // Tab switching functionality
+    const tabLessonBtn = document.getElementById('tab-lesson');
+    const tabResourcesBtn = document.getElementById('tab-resources');
+    const lessonContent = document.getElementById('lesson-content');
+    const resourcesContent = document.getElementById('resources-content');
+    
+    if (tabLessonBtn && tabResourcesBtn) {
+        tabLessonBtn.addEventListener('click', () => {
+            lessonContent.classList.remove('hidden');
+            resourcesContent.classList.add('hidden');
+            
+            tabLessonBtn.classList.remove('text-gray-600', 'dark:text-gray-400', 'border-transparent');
+            tabLessonBtn.classList.add('text-gray-900', 'dark:text-white', 'border-primary');
+            
+            tabResourcesBtn.classList.remove('text-gray-900', 'dark:text-white', 'border-primary');
+            tabResourcesBtn.classList.add('text-gray-600', 'dark:text-gray-400', 'border-transparent');
+        });
+        
+        tabResourcesBtn.addEventListener('click', () => {
+            lessonContent.classList.add('hidden');
+            resourcesContent.classList.remove('hidden');
+            
+            tabResourcesBtn.classList.remove('text-gray-600', 'dark:text-gray-400', 'border-transparent');
+            tabResourcesBtn.classList.add('text-gray-900', 'dark:text-white', 'border-primary');
+            
+            tabLessonBtn.classList.remove('text-gray-900', 'dark:text-white', 'border-primary');
+            tabLessonBtn.classList.add('text-gray-600', 'dark:text-gray-400', 'border-transparent');
+        });
+    }
+
+    const ENABLE_CARBON_POPUP = true;
+    const ENABLE_CARBON_TOTAL = true;
+    const CARBON_POPUP_DELAY_MS = 700;
+    const CARBON_POPUP_DURATION_MS = 5000;
+    let lastCarbonHash = null;
+
+    function calculateCarbonSavings(totalTokens) {
+        const baselineEnergyPer1k = 0.0009;
+        const localEnergyPer1k = 0.00015;
+        const carbonIntensity = 0.42;
+
+        const baselineEnergy = (totalTokens / 1000) * baselineEnergyPer1k;
+        const localEnergy = (totalTokens / 1000) * localEnergyPer1k;
+        const baselineCarbonKg = baselineEnergy * carbonIntensity;
+        const localCarbonKg = localEnergy * carbonIntensity;
+        const savingsKg = baselineCarbonKg - localCarbonKg;
+
+        if (savingsKg <= 0) return 0;
+        const grams = savingsKg * 1000;
+        return Math.round(grams * 10) / 10;
+    }
+
+    function convertCarbonToEquivalent(grams) {
+        if (grams < 30) {
+            return 'That is roughly equal to charging a smartphone for several hours.';
+        }
+        if (grams < 120) {
+            return 'That is roughly equal to charging a smartphone for several days.';
+        }
+        return 'That is roughly equal to driving a short distance.';
+    }
+
+    function stripHtml(html) {
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        return temp.textContent || temp.innerText || '';
+    }
+
+    function estimateTokensFromText(text) {
+        if (!text) return 0;
+        return Math.max(1, Math.ceil(text.length / 4));
+    }
+
+    function resolveTokenCount(text, tokenMeta) {
+        if (typeof tokenMeta === 'number' && tokenMeta > 0) {
+            return tokenMeta;
+        }
+        return estimateTokensFromText(text);
+    }
+
+    function updateTotalCarbonSaved(grams) {
+        if (!ENABLE_CARBON_TOTAL) return null;
+        const current = parseFloat(localStorage.getItem('total_carbon_saved') || '0');
+        const updated = Math.round((current + grams) * 10) / 10;
+        localStorage.setItem('total_carbon_saved', updated.toString());
+        return updated;
+    }
+
+    function hideCarbonToast(toast) {
+        if (!toast) return;
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 250);
+    }
+
+    function showCarbonToast(gramsSaved) {
+        const toast = document.createElement('div');
+        toast.className = 'carbon-toast';
+        toast.innerHTML = `
+            <button class="carbon-close" aria-label="Dismiss">
+                <span class="material-symbols-outlined text-base">close</span>
+            </button>
+            <div class="carbon-title">
+                <span class="material-symbols-outlined text-base">eco</span>
+                <span>Carbon savings</span>
+            </div>
+            <div class="carbon-body">
+                You saved <strong>${gramsSaved.toFixed(1)}g of CO2</strong> by using an efficient local AI model.
+                ${convertCarbonToEquivalent(gramsSaved)}
+            </div>
+            <div class="carbon-meta">
+                <span class="material-symbols-outlined text-sm">info</span>
+                <span title="Carbon estimates are approximate and based on typical AI energy usage.">Approximate estimate</span>
+            </div>
+        `;
+
+        const total = updateTotalCarbonSaved(gramsSaved);
+        if (ENABLE_CARBON_TOTAL && total !== null) {
+            const totalEl = document.createElement('div');
+            totalEl.className = 'carbon-total';
+            totalEl.textContent = `Total saved so far: ${total.toFixed(1)} g CO2`;
+            toast.appendChild(totalEl);
+        }
+
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('show'));
+
+        const closeButton = toast.querySelector('.carbon-close');
+        const onClose = () => hideCarbonToast(toast);
+        closeButton.addEventListener('click', onClose, { once: true });
+
+        const onOutsideClick = (event) => {
+            if (!toast.contains(event.target)) {
+                hideCarbonToast(toast);
+                document.removeEventListener('click', onOutsideClick);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', onOutsideClick), 0);
+
+        setTimeout(onClose, CARBON_POPUP_DURATION_MS);
+    }
+
+    function triggerCarbonPopup(text, tokenMeta) {
+        if (!ENABLE_CARBON_POPUP) return;
+        const plainText = stripHtml(text || '');
+        if (!plainText) return;
+        const hash = plainText.slice(0, 400);
+        if (hash === lastCarbonHash) return;
+        lastCarbonHash = hash;
+
+        const tokens = resolveTokenCount(plainText, tokenMeta);
+        const savings = calculateCarbonSavings(tokens);
+        if (savings <= 0) return;
+
+        setTimeout(() => showCarbonToast(savings), CARBON_POPUP_DELAY_MS);
+    }
+    
+    async function updateLessonContent() {
+        const courseId = {{ course.id }};
+        
+        if (!lessonContent) return;
+        
+        try {
+            console.log('🔄 Güncellenmiş RAG cevabı yükleniyor...');
+            const response = await fetch(`/edu/courses/${courseId}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const responseHtml = data.response || '<p>İçerik güncellenemedi</p>';
+                const tokenMeta = data?.token_usage?.total_tokens || data?.usage?.total_tokens || data?.tokens || null;
+                
+                lessonContent.innerHTML = responseHtml;
+                triggerCarbonPopup(responseHtml, tokenMeta);
+                console.log('✅ Ders içeriği yeni dosyalarla güncellendi');
+            } else {
+                console.error('❌ Ders içeriği güncellenirken hata:', response.status);
+            }
+        } catch (error) {
+            console.error('❌ Error updating lesson content:', error);
+        }
+    }
+    
+    async function loadCourseDocuments() {
+        const courseId = {{ course.id }};
+        const resourcesContainer = document.getElementById('resources-container');
+        
+        if (!resourcesContainer) return;
+        
+        try {
+            const response = await fetch(`/edu/course-documents/${courseId}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                const documents = data.documents || [];
+                
+                if (documents.length === 0) {
+                    resourcesContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Kaynak bulunamadı.</p>';
+                    return;
+                }
+                
+                let html = '';
+                documents.forEach(doc => {
+                    html += `
+                        <a href="${doc.encoded_path}" target="_blank" class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                            <span class="material-symbols-outlined text-primary">picture_as_pdf</span>
+                            <span class="text-gray-900 dark:text-white font-medium">${doc.name}</span>
+                            <span class="material-symbols-outlined text-gray-400 ml-auto">download</span>
+                        </a>
+                    `;
+                });
+                
+                resourcesContainer.innerHTML = html;
+                console.log(`✅ ${documents.length} kaynak yüklendi`);
+            } else {
+                resourcesContainer.innerHTML = '<p class="text-red-500">Kaynaklar yüklenirken hata oluştu.</p>';
+                console.error('Error loading documents:', response.status);
+            }
+        } catch (error) {
+            resourcesContainer.innerHTML = '<p class="text-red-500">Kaynaklar yüklenirken hata oluştu.</p>';
+            console.error('Error fetching course documents:', error);
+        }
+    }
+    
+    // PDF Upload Handler
+    const pdfUploadInput = document.getElementById('pdf-upload');
+    const uploadBtn = document.getElementById('upload-btn');
+    const uploadProgress = document.getElementById('upload-progress');
+    const uploadProgressBar = document.getElementById('upload-progress-bar');
+    const uploadStatus = document.getElementById('upload-status');
+    
+    console.log('🔍 PDF Upload Init:', { pdfUploadInput, uploadBtn, uploadProgress, uploadProgressBar, uploadStatus });
+    
+    if (uploadBtn && pdfUploadInput) {
+        uploadBtn.addEventListener('click', () => {
+            console.log('📁 Upload button clicked');
+            pdfUploadInput.click();
+        });
+        
+        pdfUploadInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            console.log(`📂 Files selected: ${files.length}`, files.map(f => f.name));
+            
+            if (files.length === 0) return;
+            
+            if (uploadProgress) {
+                uploadProgress.classList.remove('hidden');
+                console.log('✅ Upload progress shown');
+            }
+            
+            const courseId = {{ course.id }};
+            console.log(`🎯 Course ID: ${courseId}`);
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    if (uploadStatus) {
+                        uploadStatus.textContent = `Yükleniyor: ${file.name} (${i + 1}/${files.length})`;
+                    }
+                    if (uploadProgressBar) {
+                        uploadProgressBar.style.width = ((i + 1) / files.length * 100) + '%';
+                    }
+                    
+                    console.log(`🚀 Uploading ${file.name} to /edu/upload-pdf/${courseId}`);
+                    
+                    const response = await fetch(`/edu/upload-pdf/${courseId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    console.log(`📡 Response status: ${response.status}`);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log(`✅ ${file.name} başarıyla yüklendi:`, result);
+                    } else {
+                        const errorText = await response.text();
+                        console.error(`❌ ${file.name} hata (${response.status}):`, errorText);
+                        if (uploadStatus) {
+                            uploadStatus.textContent = `❌ ${file.name} yüklenirken hata (${response.status})`;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`❌ Error uploading ${file.name}:`, error);
+                    if (uploadStatus) {
+                        uploadStatus.textContent = `❌ ${file.name} yüklenirken hata: ${error.message}`;
+                    }
+                }
+            }
+            
+            if (uploadStatus) {
+                uploadStatus.textContent = `✅ Tüm dosyalar yüklendi ve işlendi!`;
+            }
+            
+            setTimeout(() => {
+                if (uploadProgress) {
+                    uploadProgress.classList.add('hidden');
+                }
+                console.log('🔄 Yüklü kaynakları ve ders içeriğini yenileniyor...');
+                loadCourseDocuments();
+                updateLessonContent();
+                pdfUploadInput.value = '';
+            }, 2000);
+        });
+        
+        // Drag and drop
+        const uploadArea = uploadProgress?.parentElement;
+        console.log('📌 Upload area:', uploadArea);
+        
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('bg-blue-50', 'dark:bg-blue-900/20');
+                console.log('📥 Drag over');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('bg-blue-50', 'dark:bg-blue-900/20');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('bg-blue-50', 'dark:bg-blue-900/20');
+                
+                const files = e.dataTransfer.files;
+                console.log(`📥 Files dropped: ${files.length}`);
+                pdfUploadInput.files = files;
+                
+                const event = new Event('change', { bubbles: true });
+                pdfUploadInput.dispatchEvent(event);
+            });
+        }
+    } else {
+        console.error('❌ Upload elements not found:', { uploadBtn, pdfUploadInput });
+    }
+    
+    // Load documents when page loads
+    document.addEventListener('DOMContentLoaded', loadCourseDocuments);
+</script>
+
+</html>

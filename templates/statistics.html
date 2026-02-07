@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow - Dashboard</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2b6cee",
+                        "background-light": "#f9fafb",
+                        "background-dark": "#0f172a",
+                        "success": "#22c55e",
+                        "warning": "#f59e0b",
+                        "danger": "#ef4444"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        serif: ["Lora", "serif"],
+                    },
+                }
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 min-h-screen">
+        <!-- Header -->
+        {% include 'navbar.html' %}
+
+        <!-- Main Content -->
+        <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <!-- AI Evaluation Section -->
+            <div class="mb-12 bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 rounded-lg border border-primary/20 dark:border-primary/30 p-8 shadow-sm">
+                <div class="flex items-start gap-4 mb-6">
+                    <span class="material-symbols-outlined text-primary text-4xl">smart_toy</span>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">AI Performance Evaluation</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">AI-powered personalized analysis and recommendations</p>
+                    </div>
+                </div>
+                
+                <div id="ai-evaluation-content" class="bg-white dark:bg-gray-950 rounded-lg p-6 border border-primary/20">
+                    <div class="flex items-center justify-center py-12">
+                        <div class="text-center">
+                            <div class="animate-spin mb-4">
+                                <span class="material-symbols-outlined text-primary text-4xl">hourglass_empty</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400">Hazırlanıyor...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <!-- Total Sessions -->
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Toplam Oturumlar</h3>
+                        <span class="material-symbols-outlined text-primary text-xl">video_camera</span>
+                    </div>
+                    <p id="total-sessions" class="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Eye tracking oturumları</p>
+                </div>
+
+                <!-- Total Study Time -->
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Study Hours</h3>
+                        <span class="material-symbols-outlined text-success text-xl">schedule</span>
+                    </div>
+                    <p id="total-hours" class="text-3xl font-bold text-gray-900 dark:text-white">0<span class="text-lg">h</span></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Toplam çalışma saati</p>
+                </div>
+
+                <!-- Average Focus -->
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Average Focus</h3>
+                        <span class="material-symbols-outlined text-warning text-xl">psychology</span>
+                    </div>
+                    <p id="avg-focus" class="text-3xl font-bold text-gray-900 dark:text-white">0<span class="text-lg">%</span></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Oturumlar arası ortalama</p>
+                </div>
+
+                <!-- Tab Switches -->
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Sekme Değişimleri</h3>
+                        <span class="material-symbols-outlined text-danger text-xl">tabs</span>
+                    </div>
+                    <p id="tab-switches" class="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Toplam sekme değişimi</p>
+                </div>
+            </div>
+
+            <!-- Focus Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Focus Breakdown</h3>
+                    <div class="space-y-4">
+                        <!-- Good Focus -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-success"></span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Good Focus</span>
+                                </div>
+                                <span id="focus-good-pct" class="text-sm font-semibold">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                                <div id="focus-good-bar" class="bg-success h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p id="focus-good-time" class="text-xs text-gray-500 dark:text-gray-400 mt-1">0 dakika</p>
+                        </div>
+
+                        <!-- Warning Focus -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-warning"></span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Dikkat Dağınıklığı</span>
+                                </div>
+                                <span id="focus-warning-pct" class="text-sm font-semibold">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                                <div id="focus-warning-bar" class="bg-warning h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p id="focus-warning-time" class="text-xs text-gray-500 dark:text-gray-400 mt-1">0 dakika</p>
+                        </div>
+
+                        <!-- Alert Focus -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-danger"></span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Lost Focus</span>
+                                </div>
+                                <span id="focus-alert-pct" class="text-sm font-semibold">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                                <div id="focus-alert-bar" class="bg-danger h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p id="focus-alert-time" class="text-xs text-gray-500 dark:text-gray-400 mt-1">0 dakika</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Focus Pie Chart -->
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm flex flex-col">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Focus Percentages</h3>
+                    <div class="flex-1 flex items-center justify-center">
+                        <canvas id="focusChart" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Session Distribution -->
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm flex flex-col">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Kurs Başına Oturumlar</h3>
+                    <div class="flex-1 flex items-center justify-center">
+                        <canvas id="courseChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Details -->
+            <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm mb-12">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Kurs Başına Detaylar</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800">
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Kurs</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Oturumlar</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Süre</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">İyi Odak</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Dikkat Dağınıklığı</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Odak Kaybı</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sekme Değişimi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="course-details-tbody">
+                            <tr class="border-b border-gray-200 dark:border-gray-800">
+                                <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                    <span class="inline-block animate-spin">⏳</span> Yükleniyor...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Course List -->
+            <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Tüm Kurslar</h3>
+                <div id="courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
+                        <span class="inline-block animate-spin">⏳</span> Yükleniyor...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let focusChart = null;
+        let courseChart = null;
+
+        async function loadDashboard() {
+            try {
+                console.log('📊 Dashboard verileri yükleniyor...');
+                const response = await fetch('/edu/dashboard', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Status ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ Dashboard verileri yüklendi:', data);
+                
+                updateStats(data);
+                updateFocusBreakdown(data);
+                updateCourseDetails(data);
+                updateCoursesList(data);
+                updateCharts(data);
+                
+                // Load AI evaluation
+                loadAIEvaluation();
+            } catch (error) {
+                console.error('❌ Dashboard yüklenirken hata:', error);
+                document.body.innerHTML = `
+                    <div class="flex items-center justify-center min-h-screen">
+                        <div class="text-center">
+                            <p class="text-red-500 text-lg">Dashboard yüklenirken hata oluştu</p>
+                            <p class="text-gray-500 text-sm mt-2">${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadAIEvaluation() {
+            try {
+                console.log('🤖 AI değerlendirmesi yükleniyor...');
+                const response = await fetch('/edu/dashboard-ai-evaluation', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Status ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ AI değerlendirmesi:', data);
+                
+                const container = document.getElementById('ai-evaluation-content');
+                if (data.success) {
+                    // Markdown'ı HTML'e çevir
+                    const htmlContent = marked.parse(data.evaluation);
+                    container.innerHTML = `
+                        <div class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary prose-strong:text-gray-900 dark:prose-strong:text-white prose-a:text-primary prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300">
+                            ${htmlContent}
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <p class="text-gray-600 dark:text-gray-400">AI değerlendirmesi alınamadı. Lütfen daha sonra deneyin.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ AI değerlendirmesi yüklenirken hata:', error);
+                const container = document.getElementById('ai-evaluation-content');
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-red-500">AI değerlendirmesi yüklenirken hata oluştu</p>
+                        <p class="text-gray-500 text-sm mt-2">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats(data) {
+            const eyeTracking = data.eye_tracking;
+            
+            document.getElementById('total-sessions').textContent = eyeTracking.total_sessions;
+            document.getElementById('total-hours').textContent = eyeTracking.total_duration_hours;
+            
+            const avgFocus = ((eyeTracking.focus_breakdown.good.seconds / 
+                (eyeTracking.focus_breakdown.good.seconds + 
+                 eyeTracking.focus_breakdown.warning.seconds + 
+                 eyeTracking.focus_breakdown.alert.seconds) * 100) || 0).toFixed(1);
+            document.getElementById('avg-focus').textContent = avgFocus;
+            
+            document.getElementById('tab-switches').textContent = eyeTracking.total_tab_switches;
+        }
+
+        function updateFocusBreakdown(data) {
+            const focus = data.eye_tracking.focus_breakdown;
+            
+            // Good focus
+            document.getElementById('focus-good-pct').textContent = focus.good.percentage + '%';
+            document.getElementById('focus-good-bar').style.width = focus.good.percentage + '%';
+            document.getElementById('focus-good-time').textContent = Math.round(focus.good.seconds / 60) + ' dakika';
+            
+            // Warning focus
+            document.getElementById('focus-warning-pct').textContent = focus.warning.percentage + '%';
+            document.getElementById('focus-warning-bar').style.width = focus.warning.percentage + '%';
+            document.getElementById('focus-warning-time').textContent = Math.round(focus.warning.seconds / 60) + ' dakika';
+            
+            // Alert focus
+            document.getElementById('focus-alert-pct').textContent = focus.alert.percentage + '%';
+            document.getElementById('focus-alert-bar').style.width = focus.alert.percentage + '%';
+            document.getElementById('focus-alert-time').textContent = Math.round(focus.alert.seconds / 60) + ' dakika';
+        }
+
+        function updateCourseDetails(data) {
+            const tbody = document.getElementById('course-details-tbody');
+            const courseMap = {};
+            
+            // Create course map
+            data.courses.forEach(course => {
+                courseMap[course.id] = course.title;
+            });
+            
+            let html = '';
+            for (const [courseId, sessions] of Object.entries(data.course_sessions)) {
+                const courseName = courseMap[courseId] || `Kurs ${courseId}`;
+                const focusTotal = sessions.focus_good + sessions.focus_warning + sessions.focus_alert;
+                const goodPct = focusTotal > 0 ? ((sessions.focus_good / focusTotal) * 100).toFixed(1) : 0;
+                
+                html += `
+                    <tr class="border-b border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">${courseName}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">${sessions.sessions}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">${(sessions.duration / 60).toFixed(1)} dk</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-success"></span>
+                                <span class="text-gray-700 dark:text-gray-300">${(sessions.focus_good / 60).toFixed(0)} dk</span>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-warning"></span>
+                                <span class="text-gray-700 dark:text-gray-300">${(sessions.focus_warning / 60).toFixed(0)} dk</span>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-danger"></span>
+                                <span class="text-gray-700 dark:text-gray-300">${(sessions.focus_alert / 60).toFixed(0)} dk</span>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">${sessions.tab_switches}</td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html || '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Veri bulunamadı</td></tr>';
+        }
+
+        function updateCoursesList(data) {
+            const container = document.getElementById('courses-list');
+            
+            let html = '';
+            data.courses.forEach(course => {
+                const sessions = data.course_sessions[course.id];
+                const sessionCount = sessions ? sessions.sessions : 0;
+                
+                html += `
+                    <a href="/edu/courses/${course.id}" class="block p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:shadow-md dark:hover:bg-gray-900 transition-all">
+                        <div class="flex items-start justify-between mb-2">
+                            <h4 class="font-semibold text-gray-900 dark:text-white">${course.title}</h4>
+                            <span class="material-symbols-outlined text-primary text-sm">arrow_outward</span>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">${course.description}</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">video_camera</span>
+                                <span>${sessionCount} oturum</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">calendar_today</span>
+                                <span>${new Date(course.date_created).toLocaleDateString('tr-TR')}</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            });
+            
+            container.innerHTML = html || '<div class="col-span-full text-center text-gray-500 py-8">Kurs bulunamadı</div>';
+        }
+
+        function updateCharts(data) {
+            const focus = data.eye_tracking.focus_breakdown;
+            
+            // Pie Chart for Focus
+            const focusCtx = document.getElementById('focusChart').getContext('2d');
+            if (focusChart) focusChart.destroy();
+            focusChart = new Chart(focusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['İyi Odak', 'Dikkat Dağınıklığı', 'Odak Kaybı'],
+                    datasets: [{
+                        data: [
+                            focus.good.percentage,
+                            focus.warning.percentage,
+                            focus.alert.percentage
+                        ],
+                        backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+                        borderColor: ['#16a34a', '#d97706', '#dc2626'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151',
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Bar Chart for Course Sessions
+            const courseCtx = document.getElementById('courseChart').getContext('2d');
+            const courseLabels = [];
+            const courseSessions = [];
+            
+            data.courses.forEach(course => {
+                const sessions = data.course_sessions[course.id];
+                if (sessions) {
+                    courseLabels.push(course.title.substring(0, 15));
+                    courseSessions.push(sessions.sessions);
+                }
+            });
+            
+            if (courseChart) courseChart.destroy();
+            courseChart = new Chart(courseCtx, {
+                type: 'bar',
+                data: {
+                    labels: courseLabels.length > 0 ? courseLabels : ['Veri Yok'],
+                    datasets: [{
+                        label: 'Oturumlar',
+                        data: courseSessions.length > 0 ? courseSessions : [0],
+                        backgroundColor: '#2b6cee',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151'
+                            },
+                            grid: {
+                                color: document.documentElement.classList.contains('dark') ? '#1f2937' : '#e5e7eb'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load dashboard on page load
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

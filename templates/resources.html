@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow - Resources</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2b6cee",
+                        "background-light": "#f9fafb",
+                        "background-dark": "#0f172a",
+                        "success": "#22c55e",
+                        "warning": "#f59e0b",
+                        "danger": "#ef4444"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        serif: ["Lora", "serif"],
+                    },
+                }
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 min-h-screen">
+        <!-- Header -->
+        {% include 'navbar.html' %}
+
+        <!-- Main Content -->
+        <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Page Header -->
+            <div class="mb-12">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="p-3 rounded-lg bg-primary/10">
+                        <span class="material-symbols-outlined text-primary text-4xl">library_books</span>
+                    </div>
+                    <div>
+                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">Resources Library</h1>
+                        <p class="text-gray-600 dark:text-gray-400">Access all PDF resources and learning materials</p>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Files</p>
+                                <p id="total-files" class="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                            </div>
+                            <span class="material-symbols-outlined text-primary text-3xl">description</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Size</p>
+                                <p id="total-size" class="text-3xl font-bold text-gray-900 dark:text-white">0 MB</p>
+                            </div>
+                            <span class="material-symbols-outlined text-success text-3xl">storage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <input 
+                        id="search-input"
+                        type="text" 
+                        placeholder="Search resources..." 
+                        class="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    />
+                    <button id="sort-btn" class="px-6 py-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors font-medium flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">sort</span>
+                        <span class="hidden sm:inline">Sort</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resources Grid -->
+            <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="col-span-full flex items-center justify-center py-12">
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-5xl text-gray-400 mb-4 inline-block animate-spin">hourglass_empty</span>
+                        <p class="text-gray-600 dark:text-gray-400">Loading resources...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-12 text-center">
+                <span class="material-symbols-outlined text-6xl text-gray-400 mx-auto mb-4 block">folder_open</span>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Resources Found</h3>
+                <p class="text-gray-600 dark:text-gray-400">No resource files have been uploaded yet.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let allDocuments = [];
+        let sortBy = 'name';
+
+        async function loadResources() {
+            try {
+                console.log('Loading resources...');
+                const response = await fetch('/edu/resources', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Status ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Resources loaded:', data);
+                
+                allDocuments = data.documents || [];
+                updateStats();
+                renderResources();
+            } catch (error) {
+                console.error('Error loading resources:', error);
+                document.getElementById('empty-state').classList.remove('hidden');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('total-files').textContent = allDocuments.length;
+            
+            const totalSize = allDocuments.reduce((sum, doc) => sum + (doc.size_kb || 0), 0);
+            const totalSizeMB = (totalSize / 1024).toFixed(2);
+            document.getElementById('total-size').textContent = totalSizeMB + ' MB';
+        }
+
+        function filterResources() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            return allDocuments.filter(doc => doc.name.toLowerCase().includes(searchTerm));
+        }
+
+        function sortResources(docs) {
+            switch(sortBy) {
+                case 'name':
+                    return docs.sort((a, b) => a.name.localeCompare(b.name));
+                case 'size':
+                    return docs.sort((a, b) => (b.size_kb || 0) - (a.size_kb || 0));
+                case 'newest':
+                    return docs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                default:
+                    return docs;
+            }
+        }
+
+        function renderResources() {
+            const filtered = filterResources();
+            const sorted = sortResources([...filtered]);
+
+            const grid = document.getElementById('resources-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            if (sorted.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = sorted.map(doc => `
+                <div class="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 hover:shadow-lg dark:hover:shadow-lg dark:shadow-gray-900/20 transition-all group">
+                    <!-- Icon & Title -->
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                            <span class="material-symbols-outlined text-primary text-2xl">picture_as_pdf</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
+                                ${doc.name.replace('.pdf', '')}
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF File</p>
+                        </div>
+                    </div>
+
+                    <!-- File Info -->
+                    <div class="flex items-center justify-between mb-4 text-xs text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800 pt-4">
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">data_usage</span>
+                            <span>${doc.size_kb} KB</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">description</span>
+                            <span>PDF</span>
+                        </div>
+                    </div>
+
+                    <!-- Download Button -->
+                    <a 
+                        href="${doc.encoded_path}" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white font-medium transition-colors group/btn"
+                    >
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        <span>Download</span>
+                    </a>
+                </div>
+            `).join('');
+        }
+
+        // Event Listeners
+        document.getElementById('search-input').addEventListener('input', renderResources);
+        
+        document.getElementById('sort-btn').addEventListener('click', () => {
+            const options = ['name', 'size', 'newest'];
+            const currentIndex = options.indexOf(sortBy);
+            sortBy = options[(currentIndex + 1) % options.length];
+            
+            const sortLabels = {
+                name: 'Name',
+                size: 'Size',
+                newest: 'Newest'
+            };
+            
+            document.getElementById('sort-btn').innerHTML = `
+                <span class="material-symbols-outlined text-lg">sort</span>
+                <span class="hidden sm:inline">${sortLabels[sortBy]}</span>
+            `;
+            
+            renderResources();
+        });
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadResources);
+    </script>
+</body>
+</html>

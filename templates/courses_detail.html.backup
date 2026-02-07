@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Stitch Design</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.9.3/tracking.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.9.3/data/face.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#13a4ec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101c22",
+                        // Added more colors for trackers
+                        "success": "#22c55e",
+                        "warning": "#f59e0b",
+                        "danger": "#ef4444"
+                    },
+                    fontFamily: {
+                        display: ["Lexend"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    // Added keyframes for focus alert
+                    keyframes: {
+                        pulse: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.7 } }
+                    },
+                    animation: {
+                        pulse: 'pulse 1s infinite'
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: "Lexend", sans-serif;
+        }
+
+        .radio-custom:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='%23ffffff' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+        }
+
+        /* --- ADDED: STYLES FOR TRACKING FEATURES --- */
+        .focus-indicator { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 12px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display:flex; align-items:center; gap: 8px;}
+        .focus-good { background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; color: #22c55e; }
+        .focus-warning { background: rgba(245, 158, 11, 0.1); border: 2px solid #f59e0b; color: #f59e0b; }
+        .focus-alert { background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; color: #ef4444; animation: pulse 1s infinite; }
+        
+        #calibration-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(16, 28, 34, 0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .calibration-dot { position: absolute; width: 20px; height: 20px; background: #13a4ec; border-radius: 50%; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 0 20px rgba(19, 164, 236, 0.5); }
+        .calibration-dot:hover { transform: scale(1.2); }
+        .calibration-dot.clicked { background: #22c55e; animation: calibration-click 0.3s ease; }
+        @keyframes calibration-click { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1); } }
+        
+        #webgazerVideoFeed, #webgazerFaceOverlay {
+            position: fixed !important;
+            top: 100px !important; /* Adjusted position */
+            right: 20px !important;
+            width: 180px !important; /* Adjusted size */
+            height: 135px !important;
+            border: 3px solid #13a4ec;
+            border-radius: 12px;
+            z-index: 999;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        #webgazerFaceFeedbackBox { 
+            display: none !important; 
+        }
+
+        /* --- MARKDOWN CONTENT STYLING --- */
+        .prose {
+            color: inherit;
+        }
+        
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            font-weight: 700;
+            line-height: 1.3;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #1f2937;
+        }
+        
+        .dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4, .dark .prose h5, .dark .prose h6 {
+            color: #f3f4f6;
+        }
+        
+        .prose h1 { font-size: 2em; }
+        .prose h2 { font-size: 1.5em; }
+        .prose h3 { font-size: 1.25em; }
+        .prose h4 { font-size: 1.1em; }
+        
+        .prose p {
+            margin: 1em 0;
+            line-height: 1.7;
+        }
+        
+        .prose code {
+            background: #f3f4f6;
+            color: #1f2937;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .dark .prose code {
+            background: #374151;
+            color: #f3f4f6;
+        }
+        
+        .prose pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 1em;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1em 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .dark .prose pre {
+            background: #111827;
+            color: #e5e7eb;
+        }
+        
+        .prose pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: inherit;
+        }
+        
+        .prose ul, .prose ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        
+        .prose ul {
+            list-style-type: disc;
+        }
+        
+        .prose ol {
+            list-style-type: decimal;
+        }
+        
+        .prose li {
+            margin: 0.5em 0;
+            line-height: 1.7;
+        }
+        
+        .prose strong {
+            font-weight: 700;
+            color: #111827;
+        }
+        
+        .dark .prose strong {
+            color: #f9fafb;
+        }
+        
+        .prose em {
+            font-style: italic;
+        }
+        
+        .prose blockquote {
+            border-left: 4px solid #13a4ec;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .dark .prose blockquote {
+            border-left-color: #13a4ec;
+            color: #d1d5db;
+        }
+        
+        .prose hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 2em 0;
+        }
+        
+        .dark .prose hr {
+            border-top-color: #374151;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 min-h-screen font-display">
+        {% include 'navbar.html' %}
+        <main class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+            <div class="mb-8 flex items-center justify-between">
+                <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
+                    <ol class="flex items-center space-x-2">
+                        <li>
+                            <a class="hover:text-primary dark:hover:text-primary" href="#">Uniteler</a>
+                        </li>
+                        <li><span class="material-symbols-outlined text-base">chevron_right</span></li>
+                        <li>
+                            <a class="hover:text-primary dark:hover:text-primary" href="#">Unite 1</a>
+                        </li>
+                        <li><span class="material-symbols-outlined text-base">chevron_right</span></li>
+                        <li class="font-medium text-gray-800 dark:text-gray-200">Konu 1: {{ lesson.title }}</li>
+                    </ol>
+                </nav>
+                 <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div class="flex items-center gap-1" title="Tab Switches">
+                        <span class="material-symbols-outlined text-base">tab_move</span>
+                        <span id="tab-switch-counter">Sekme Değiştirme: 0</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base">timer</span>
+                        <span>Tahmini Süre: 10 dk</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">Konu 1: {{ lesson.title }}</h1>
+                <p class="mt-2 text-base text-gray-600 dark:text-gray-300">Geometriye giriş dersine hoşgeldin!</p>
+                <div class="mt-4 flex gap-3">
+                    <button id="eye-tracking-toggle" class="flex items-center gap-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2.5 text-sm font-semibold transition-colors">
+                        <span class="material-symbols-outlined text-base">visibility</span>
+                        <span>Odak İzlemeyi Başlat</span>
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-12">
+                <section>
+                    <h2 class="text-2xl font-bold">Giriş</h2>
+                    <div class="mt-4 text-base leading-relaxed text-gray-700 dark:text-gray-300 prose prose-invert max-w-none" style="overflow-wrap: break-word; word-wrap: break-word;">
+                        {{ response | safe }}
+                    </div>
+                </section>
+                <section>
+                    <h2 class="text-2xl font-bold">Anahtar Kelimeler</h2>
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
+                            <div
+                                class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span class="material-symbols-outlined text-3xl">book</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Nokta</h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Nokta, geometride boyutsuz olarak ifade edilen; eni, boyu ve derinliği olmayan bir terimdir.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
+                            <div
+                                class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span class="material-symbols-outlined text-3xl">note</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Çizgi</h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Çizgiler, iki, üç veya daha yüksek boyutlu uzaylara gömülebilen bir boyutlu uzaylardır.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
+                            <div
+                                class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span class="material-symbols-outlined text-3xl">fullscreen</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Düzlem</h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Uzayda bulunan bir doğrunun yön değiştirmeden ve kendi doğrultusunda olmayan hareketiyle meydana getireceği kabul edilen yüzeylere denir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2 class="text-2xl font-bold">Senin için önerdiğimiz:</h2>
+                    <b><p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Bu seçim senin ortalama odak sürene, eksiklerine, ağırlıklı olarak seçtiğin öğrenme tarzına göre yapıldı.</p></b>
+                            
+                    <div class="mt-6 aspect-[3/2] w-full overflow-hidden rounded-lg">
+                        <iframe width="850" height="600" src="https://www.youtube.com/embed/bAcjMIdtt9k?si=X8SA5u-9HqhHnFfc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </section>
+                <section class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+                    <h2 class="text-2xl font-bold mb-4">Oturumu Tamamla</h2>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Odak izleme verilerinizi kaydetmek ve bu dersi tamamlamak için aşağıdaki düğmeye tıklayın.</p>
+                    <button id="quiz-submit-btn" class="inline-flex items-center gap-2 rounded-lg bg-primary text-white hover:bg-primary/90 px-6 py-3 text-base font-semibold transition-colors">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>Oturumu Tamamla ve Kaydet</span>
+                    </button>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="focus-indicator" class="focus-indicator" style="display: none;"><span id="focus-text"></span></div>
+    <canvas id="gaze-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 998; display: none;"></canvas>
+    <div id="calibration-modal" style="display: none;">
+        <div class="bg-background-light dark:bg-background-dark rounded-xl p-8 text-center max-w-lg mx-4">
+            <h3 class="text-2xl font-bold mb-4">🎯 Eye Tracking Setup</h3>
+            <div id="calibration-area" class="relative w-80 h-60 mx-auto mb-6 bg-gray-200/50 dark:bg-gray-800/50 rounded-lg" style="display: none;"></div>
+            <div id="setup-options">
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Choose a method to monitor focus.</p>
+                <div class="flex gap-4 justify-center">
+                    <button id="start-calibration" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2"><span class="material-symbols-outlined">videocam</span> Use Webcam</button>
+                    <button id="skip-calibration" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:opacity-80 flex items-center gap-2"><span class="material-symbols-outlined">mouse</span> Use Mouse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completion Popup -->
+    <div id="completion-popup" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-background-light dark:bg-background-dark rounded-xl p-8 max-w-md mx-4 text-center">
+            <div class="text-5xl mb-4">✅</div>
+            <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Oturum Tamamlandı!</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-2">
+                Harcadığınız Zaman: <span id="time-spent" class="font-semibold">0 dakika</span>
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                Odak izleme verileriniz başarıyla kaydedildi.
+            </p>
+            <button id="continue-btn" class="w-full bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary/90 font-semibold transition-colors">
+                Devam Et
+            </button>
+        </div>
+    </div>
+
+
+</body>
+<script>
+    // --- POMODORO TIMER CODE ---
+    const timerLabel = document.querySelector("#pomodoro-timer p:nth-child(1)");
+    const timerDisplay = document.querySelector("#pomodoro-timer p:nth-child(2)");
+    const pausePlayButton = document.getElementById("pause-play-btn");
+    const pausePlayIcon = pausePlayButton ? pausePlayButton.querySelector("span") : null;
+    const restartButton = document.getElementById("restart-btn");
+
+    // Only initialize Pomodoro if elements exist
+    if (pausePlayButton && restartButton && timerLabel && timerDisplay) {
+        const workDuration = 25 * 60;
+        const breakDuration = 5 * 60;
+
+        let isWork = true;
+        let timeLeft = workDuration;
+        let isPaused = false;
+        let timerInterval = null;
+
+        function formatTime(seconds) {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(timeLeft);
+            timerLabel.textContent = `Pomodoro: ${isWork ? "Work" : "Break"}`;
+            pausePlayIcon.textContent = isPaused ? "play_arrow" : "pause";
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                } else {
+                    isWork = !isWork;
+                    timeLeft = isWork ? workDuration : breakDuration;
+                }
+                updateDisplay();
+            }, 1000);
+            isPaused = false;
+            updateDisplay();
+        }
+
+        function togglePausePlay() {
+            if (isPaused) startTimer();
+            else { clearInterval(timerInterval); isPaused = true; updateDisplay(); }
+        }
+
+        function restartTimer() {
+            clearInterval(timerInterval);
+            timeLeft = isWork ? workDuration : breakDuration;
+            startTimer();
+        }
+
+        pausePlayButton.addEventListener("click", togglePausePlay);
+        restartButton.addEventListener("click", restartTimer);
+
+        startTimer();
+    }
+    // --- POMODORO TIMER END ---
+    
+    // --- ADDED: EYE TRACKING ---
+    // --- ADDED: EYE TRACKING WITH TRACKING.JS ---
+    class EyeTracking {
+        constructor() {
+            this.isEnabled = false;
+            this.trackingMode = 'none';
+            this.focusArea = null;
+            this.focusStatus = 'good';
+            this.offFocusStartTime = null;
+            this.focusCheckInterval = null;
+            this.lastPrediction = null;
+            this.animationFrame = null;
+            this.faceDetected = false;
+            this.canvas = document.getElementById('gaze-canvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.video = null;
+            this.tracker = null;
+            this.focusGoodTime = 0;
+            this.focusWarningTime = 0;
+            this.focusAlertTime = 0;
+            this.lastFocusStatusChangeTime = Date.now();
+            this.initializeElements();
+            this.bindEvents();
+            this.setupCanvas();
+        }
+
+        initializeElements() {
+            this.toggleButton = document.getElementById('eye-tracking-toggle');
+            this.focusIndicator = document.getElementById('focus-indicator');
+            this.focusText = document.getElementById('focus-text');
+            this.calibrationModal = document.getElementById('calibration-modal');
+            this.calibrationArea = document.getElementById('calibration-area');
+            this.startCalibrationBtn = document.getElementById('start-calibration');
+            this.skipCalibrationBtn = document.getElementById('skip-calibration');
+            this.setupOptions = document.getElementById('setup-options');
+        }
+
+        bindEvents() {
+            if (this.toggleButton) {
+                this.toggleButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Eye tracking button clicked, current state:', this.isEnabled);
+                    if (this.isEnabled) {
+                        this.disable();
+                    } else {
+                        this.enable();
+                    }
+                });
+            }
+            
+            if (this.startCalibrationBtn) {
+                this.startCalibrationBtn.addEventListener('click', () => this.startWebcamCalibration());
+            }
+            
+            if (this.skipCalibrationBtn) {
+                this.skipCalibrationBtn.addEventListener('click', () => this.enableMouseTracking());
+            }
+            
+            window.addEventListener('resize', () => { 
+                this.resizeCanvas();
+                this.updateFocusArea();
+            });
+        }
+
+        setupCanvas() { 
+            this.resizeCanvas();
+        }
+
+        resizeCanvas() { 
+            const dpr = window.devicePixelRatio || 1;
+            this.canvas.width = window.innerWidth * dpr;
+            this.canvas.height = window.innerHeight * dpr;
+            this.canvas.style.width = `${window.innerWidth}px`;
+            this.canvas.style.height = `${window.innerHeight}px`;
+            this.ctx.scale(dpr, dpr);
+        }
+
+        enable() { 
+            console.log('Enabling eye tracking');
+            this.calibrationModal.style.display = 'flex';
+            this.setupOptions.style.display = 'block';
+            this.calibrationArea.style.display = 'none';
+        }
+
+        async startWebcamCalibration() { 
+            this.setupOptions.style.display = 'none';
+            this.calibrationArea.style.display = 'block';
+            
+            const loadingMsg = document.createElement('div');
+            loadingMsg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #666; font-size: 14px; background: rgba(255,255,255,0.9); padding: 16px; border-radius: 8px;';
+            loadingMsg.textContent = 'Kamera başlatılıyor... Lütfen bekleyin';
+            this.calibrationArea.appendChild(loadingMsg);
+
+            try {
+                console.log('🎥 Starting face tracking with Tracking.js...');
+
+                // Create video element
+                this.video = document.createElement('video');
+                this.video.setAttribute('autoplay', 'true');
+                this.video.setAttribute('muted', 'true');
+                
+                // Request camera access
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 320, height: 240 } 
+                });
+                this.video.srcObject = stream;
+
+                // Wait for video to start
+                await new Promise(resolve => {
+                    this.video.onloadedmetadata = () => resolve();
+                });
+
+                console.log('✅ Camera started, initializing face tracker...');
+
+                // Initialize Tracking.js face detector
+                this.tracker = new tracking.ObjectTracker('face');
+                this.tracker.setInitialScale(4);
+                this.tracker.setStepSize(2);
+                this.tracker.setEdgesDensity(0.1);
+
+                // Track faces
+                this.tracker.track(this.video);
+
+                let faceDetected = false;
+                this.tracker.on('track', (event) => {
+                    if (event.data.length > 0) {
+                        faceDetected = true;
+                        const face = event.data[0];
+                        // Face center coordinates
+                        this.lastPrediction = {
+                            x: face.x + face.width / 2,
+                            y: face.y + face.height / 2
+                        };
+                    }
+                });
+
+                // Wait 5 seconds for face detection or proceed
+                await new Promise(resolve => {
+                    let waited = 0;
+                    const checkInterval = setInterval(() => {
+                        waited += 500;
+                        if (faceDetected || waited >= 5000) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 500);
+                });
+
+                if (faceDetected) {
+                    console.log('✅ Face detected! Starting...');
+                } else {
+                    console.warn('⚠️ No face detected. Switching to mouse tracking...');
+                    if (this.video && this.video.srcObject) {
+                        this.video.srcObject.getTracks().forEach(track => track.stop());
+                    }
+                    loadingMsg.remove();
+                    this.calibrationArea.innerHTML = '';
+                    this.enableMouseTracking();
+                    return;
+                }
+
+                loadingMsg.remove();
+                this.trackingMode = 'webcam';
+                this.calibrationModal.style.display = 'none';
+                this.enableSharedTracking();
+                this.setFocusStatus('good', 'Face Tracking 👁️');
+                console.log('✅ Webcam tracking enabled');
+
+            } catch (error) {
+                console.error('❌ Camera Error:', error);
+                
+                if (this.video && this.video.srcObject) {
+                    this.video.srcObject.getTracks().forEach(track => track.stop());
+                }
+
+                loadingMsg.remove();
+                this.calibrationArea.innerHTML = '';
+                
+                const fallbackMsg = document.createElement('div');
+                fallbackMsg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ff6b6b; font-size: 14px; background: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; text-align: center; max-width: 280px;';
+                fallbackMsg.innerHTML = `
+                    <div style="margin-bottom: 8px; font-weight: bold;">⚠️ Kamera Erişimi Hatası</div>
+                    <div style="font-size: 12px; margin-bottom: 12px; line-height: 1.4;">
+                        Kamera erişimi gerekli. Adres çubuğundaki kamera simgesine tıklayıp izin verin.
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="retry-camera" style="flex: 1; background: #13a4ec; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">🔄 Tekrar Dene</button>
+                        <button id="use-mouse" style="flex: 1; background: #6c757d; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">🖱️ Fare Takibi</button>
+                    </div>
+                `;
+                this.calibrationArea.appendChild(fallbackMsg);
+
+                document.getElementById('retry-camera').addEventListener('click', () => {
+                    this.calibrationArea.innerHTML = '';
+                    this.startWebcamCalibration();
+                });
+
+                document.getElementById('use-mouse').addEventListener('click', () => {
+                    this.enableMouseTracking();
+                });
+            }
+        }
+
+        async enableMouseTracking() { 
+            if (this.video && this.video.srcObject) {
+                this.video.srcObject.getTracks().forEach(track => track.stop());
+            }
+
+            this.trackingMode = 'mouse';
+            this.calibrationModal.style.display = 'none';
+            this.enableSharedTracking();
+            document.addEventListener('mousemove', this.handleMouseMove);
+            this.setFocusStatus('warning', 'Mouse Tracking 🖱️');
+            console.log('🖱️ Mouse tracking enabled');
+        }
+
+        enableSharedTracking() { 
+            this.isEnabled = true;
+            this.focusIndicator.style.display = 'flex';
+            this.canvas.style.display = 'block';
+            this.updateButtonState('disable');
+            this.updateFocusArea();
+            this.focusCheckInterval = setInterval(() => this.checkFocus(), 500);
+            this.startRendering();
+        }
+
+        disable() { 
+            this.isEnabled = false;
+            this.focusIndicator.style.display = 'none';
+            this.canvas.style.display = 'none';
+            this.updateButtonState('enable');
+            if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+            if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+            if (this.video && this.video.srcObject) {
+                this.video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            document.removeEventListener('mousemove', this.handleMouseMove);
+            this.trackingMode = 'none';
+            console.log('👁️ Eye tracking disabled');
+        }
+
+        updateButtonState(state) { 
+            if (!this.toggleButton) return;
+
+            if (state === 'disable') {
+                this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility_off</span><span>Odak İzlemeyi Durdur</span>`;
+                this.toggleButton.className = 'flex items-center gap-2 rounded-lg bg-danger/10 text-danger hover:bg-danger/20 px-4 py-2.5 text-sm font-semibold transition-colors';
+            } else {
+                this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility</span><span>Odak İzlemeyi Başlat</span>`;
+                this.toggleButton.className = 'flex items-center gap-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2.5 text-sm font-semibold transition-colors';
+            }
+        }
+
+        handleMouseMove = (e) => { 
+            this.handleGazeData({ x: e.clientX, y: e.clientY });
+        }
+
+        handleGazeData(data) { 
+            if (!this.isEnabled || !data) return;
+            this.lastPrediction = data;
+        }
+
+        startRendering() { 
+            if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+            const render = () => {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                if (this.isEnabled && this.lastPrediction) {
+                    this.drawGaze();
+                }
+                this.animationFrame = requestAnimationFrame(render);
+            };
+            this.animationFrame = requestAnimationFrame(render);
+        }
+
+        drawGaze() { 
+            const p = this.lastPrediction;
+            this.ctx.fillStyle = 'rgba(19, 164, 236, 0.8)';
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+
+        updateFocusArea() { 
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                const rect = mainElement.getBoundingClientRect();
+                this.focusArea = {
+                    left: rect.left,
+                    top: rect.top,
+                    right: rect.right,
+                    bottom: rect.bottom
+                };
+            }
+        }
+
+        checkFocus() { 
+            if (!this.isEnabled || !this.focusArea || !this.lastPrediction) {
+                if (this.isEnabled) this.setFocusStatus('alert', 'No Data');
+                return;
+            }
+
+            const p = this.lastPrediction;
+            const isFocused = (p.x >= this.focusArea.left && p.x <= this.focusArea.right &&
+                              p.y >= this.focusArea.top && p.y <= this.focusArea.bottom);
+
+            if (isFocused) {
+                this.setFocusStatus('good', this.trackingMode === 'webcam' ? 'Face Tracking 👁️' : 'Mouse Tracking 🖱️');
+                this.offFocusStartTime = null;
+                this.focusGoodTime += 500;
+            } else {
+                if (!this.offFocusStartTime) this.offFocusStartTime = Date.now();
+                if (Date.now() - this.offFocusStartTime > 3000) {
+                    this.setFocusStatus('alert', 'Refocus!');
+                    this.focusAlertTime += 500;
+                } else {
+                    this.setFocusStatus('warning', 'Distracted...');
+                    this.focusWarningTime += 500;
+                }
+            }
+        }
+
+        setFocusStatus(status, message) { 
+            if (this.focusStatus === status) return;
+            this.focusStatus = status;
+            this.focusText.textContent = message;
+            this.focusIndicator.className = `focus-indicator focus-${status}`;
+        }
+
+        finalizeFocusTracking() {
+            const now = Date.now();
+            const elapsed = now - this.lastFocusStatusChangeTime;
+            
+            if (this.focusStatus === 'good') {
+                this.focusGoodTime += elapsed;
+            } else if (this.focusStatus === 'warning') {
+                this.focusWarningTime += elapsed;
+            } else if (this.focusStatus === 'alert') {
+                this.focusAlertTime += elapsed;
+            }
+
+            const result = {
+                good: Math.round(this.focusGoodTime / 1000),
+                warning: Math.round(this.focusWarningTime / 1000),
+                alert: Math.round(this.focusAlertTime / 1000),
+                mode: this.trackingMode
+            };
+
+            console.log('✅ Focus tracking finalized:', result);
+            return result;
+        }
+    }
+
+    const eyeTracking = new EyeTracking();
+        
+        initializeElements() {
+            this.toggleButton = document.getElementById('eye-tracking-toggle');
+            this.focusIndicator = document.getElementById('focus-indicator');
+            this.focusText = document.getElementById('focus-text');
+            this.calibrationModal = document.getElementById('calibration-modal');
+            this.calibrationArea = document.getElementById('calibration-area');
+            this.startCalibrationBtn = document.getElementById('start-calibration');
+            this.skipCalibrationBtn = document.getElementById('skip-calibration');
+            this.setupOptions = document.getElementById('setup-options');
+            
+            if (!this.toggleButton) {
+                console.error('Eye tracking button not found');
+            }
+        }
+        
+        bindEvents() {
+            if (this.toggleButton) {
+                this.toggleButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Eye tracking button clicked, current state:', this.isEnabled);
+                    if (this.isEnabled) {
+                        this.disable();
+                    } else {
+                        this.enable();
+                    }
+                });
+            }
+            
+            if (this.startCalibrationBtn) {
+                this.startCalibrationBtn.addEventListener('click', () => this.startWebcamCalibration());
+            }
+            
+            if (this.skipCalibrationBtn) {
+                this.skipCalibrationBtn.addEventListener('click', () => this.enableMouseTracking());
+            }
+            
+            window.addEventListener('resize', () => { 
+                this.resizeCanvas();
+                this.updateFocusArea();
+            });
+        }
+        
+        setupCanvas() { 
+            this.resizeCanvas();
+        }
+        
+        resizeCanvas() { 
+            const dpr = window.devicePixelRatio || 1;
+            this.canvas.width = window.innerWidth * dpr;
+            this.canvas.height = window.innerHeight * dpr;
+            this.canvas.style.width = `${window.innerWidth}px`;
+            this.canvas.style.height = `${window.innerHeight}px`;
+            this.ctx.scale(dpr, dpr);
+        }
+        
+        enable() { 
+            console.log('Enabling eye tracking');
+            this.calibrationModal.style.display = 'flex';
+            this.setupOptions.style.display = 'block';
+            this.calibrationArea.style.display = 'none';
+        }
+        
+        async startWebcamCalibration() { 
+            this.setupOptions.style.display = 'none';
+            this.calibrationArea.style.display = 'block';
+            
+            // Add a loading message
+            const loadingMsg = document.createElement('div');
+            loadingMsg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #666; font-size: 14px; background: rgba(255,255,255,0.9); padding: 16px; border-radius: 8px;';
+            loadingMsg.textContent = 'Kamera başlatılıyor... Lütfen bekleyin (İlk başlatmada 15 saniye sürebilir)';
+            this.calibrationArea.appendChild(loadingMsg);
+            
+            try {
+                console.log('🎥 Starting WebGazer...');
+                console.log('📦 WebGazer library loaded:', typeof webgazer !== 'undefined');
+                
+                // Check if WebGazer is available
+                if (typeof webgazer === 'undefined') {
+                    throw new Error('WebGazer library not loaded');
+                }
+                
+                // Store self reference for callback
+                const self = this;
+                let dataReceived = false;
+                let dataCheckCount = 0;
+                
+                // Create a wrapper function that we know is called
+                const gazeListener = function(data, elapsedTime) {
+                    console.log('🔥 GAZE LISTENER CALLED!', { data, elapsedTime });
+                    
+                    if (data != null) {
+                        dataReceived = true;
+                        
+                        // Log first time we get data
+                        if (dataCheckCount === 0) {
+                            console.log('✅ WebGazer eye data received!', { x: data.x, y: data.y });
+                        }
+                        dataCheckCount++;
+                        
+                        // Handle the gaze data
+                        self.handleGazeData({ x: data.x, y: data.y });
+                    } else {
+                        console.warn('⚠️ Gaze listener got null data');
+                    }
+                };
+                
+                // Set up the gaze listener BEFORE calling begin()
+                console.log('📌 Setting gaze listener...');
+                webgazer.setGazeListener(gazeListener).showPredictionPoints(true);
+                console.log('📌 Gaze listener set successfully');
+                
+                console.log('🎯 Calling webgazer.begin()...');
+                webgazer.begin();
+                console.log('✅ webgazer.begin() completed');
+                
+                console.log('⏳ WebGazer started, waiting for eye data...');
+                
+                // Wait for camera to initialize with data or timeout
+                // Be more lenient - wait 15 seconds for first data
+                await new Promise((resolve, reject) => {
+                    let checkCount = 0;
+                    const maxChecks = 60; // 15 seconds with 250ms checks
+                    
+                    const checkInterval = setInterval(() => {
+                        checkCount++;
+                        
+                        // Log progress
+                        if (checkCount % 4 === 0) {
+                            console.log(`⏳ Waiting for eye data... ${(checkCount * 250) / 1000}s elapsed, dataReceived: ${dataReceived}`);
+                        }
+                        
+                        // After 6 seconds, even if no data, proceed to calibration
+                        // User can still use it even if initial data is slow
+                        if (checkCount >= 24) { // 6 seconds
+                            clearInterval(checkInterval);
+                            console.log('✅ Proceeding with calibration (may have eye data or will get it during calibration)');
+                            resolve();
+                        } else if (checkCount >= maxChecks) {
+                            clearInterval(checkInterval);
+                            reject(new Error('Camera initialization timeout - took too long'));
+                        }
+                    }, 250);
+                });
+                
+                // Clear loading message
+                loadingMsg.remove();
+                
+                console.log('🎯 Starting calibration...');
+                await this.runCalibration();
+            } catch (error) {
+                console.error('❌ Webcam Error:', error);
+                
+                // Check if this is a permission error
+                const isPermissionDenied = error.message && (
+                    error.message.includes('Permission denied') ||
+                    error.message.includes('NotAllowedError') ||
+                    error.message.includes('PermissionDenied') ||
+                    error.message.includes('permission')
+                );
+                
+                // Try to stop WebGazer if it's running
+                try {
+                    if (typeof webgazer !== 'undefined' && webgazer.isReady && webgazer.isReady()) {
+                        webgazer.end();
+                    }
+                } catch (e) {
+                    console.log('WebGazer cleanup:', e.message);
+                }
+                
+                // Clear the calibration area
+                this.calibrationArea.innerHTML = '';
+                
+                // Show fallback message with options
+                const fallbackMsg = document.createElement('div');
+                fallbackMsg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ff6b6b; font-size: 14px; background: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; text-align: center; max-width: 280px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);';
+                
+                if (isPermissionDenied) {
+                    fallbackMsg.innerHTML = `
+                        <div style="margin-bottom: 8px; font-weight: bold; font-size: 14px;">⚠️ Kamera İzni Verilmedi</div>
+                        <div style="font-size: 12px; margin-bottom: 12px; line-height: 1.4;">
+                            1. Tarayıcı adres çubuğundaki 🔒 simgesine tıklayın<br/>
+                            2. "Kamera" → "İzin Ver"i seçin<br/>
+                            3. Sayfayı yenile (F5) ve tekrar deneyin
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="retry-camera-btn" style="flex: 1; background: #13a4ec; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">🔄 Tekrar Dene</button>
+                            <button id="fallback-mouse-btn" style="flex: 1; background: #6c757d; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">🖱️ Fare Takibi</button>
+                        </div>
+                    `;
+                } else {
+                    fallbackMsg.innerHTML = `
+                        <div style="margin-bottom: 8px; font-weight: bold; font-size: 14px;">⚠️ Kamera Başlatılamadı</div>
+                        <div style="font-size: 12px; margin-bottom: 12px; line-height: 1.4;">
+                            ${error.message || 'Kamera başlatılırken bir hata oluştu.'}
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="retry-camera-btn" style="flex: 1; background: #13a4ec; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">🔄 Tekrar Dene</button>
+                            <button id="fallback-mouse-btn" style="flex: 1; background: #6c757d; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">🖱️ Fare Takibi</button>
+                        </div>
+                    `;
+                }
+                
+                this.calibrationArea.appendChild(fallbackMsg);
+                
+                // Add handlers for buttons
+                const retryBtn = document.querySelector('.retry-camera-btn');
+                if (retryBtn) {
+                    retryBtn.addEventListener('click', () => {
+                        console.log('🔄 Retrying webcam initialization...');
+                        this.calibrationArea.innerHTML = '';
+                        this.startWebcamCalibration();
+                    });
+                }
+                
+                const mouseBtn = document.getElementById('fallback-mouse-btn');
+                if (mouseBtn) {
+                    mouseBtn.addEventListener('click', () => {
+                        console.log('🖱️ User selected mouse tracking');
+                        this.enableMouseTracking();
+                    });
+                }
+            }
+        }
+        
+        runCalibration() { 
+            return new Promise(resolve => {
+                const points = [
+                    { x: 50, y: 50 },
+                    { x: 250, y: 50 },
+                    { x: 150, y: 120 },
+                    { x: 50, y: 190 },
+                    { x: 250, y: 190 }
+                ];
+                let current = 0;
+                this.calibrationArea.innerHTML = '';
+                
+                const nextPoint = () => {
+                    if (current >= points.length) {
+                        this.finishCalibration();
+                        resolve();
+                        return;
+                    }
+                    
+                    const p = points[current];
+                    const dot = document.createElement('div');
+                    dot.className = 'calibration-dot';
+                    dot.style.left = `${p.x - 10}px`;
+                    dot.style.top = `${p.y - 10}px`;
+                    this.calibrationArea.appendChild(dot);
+                    
+                    dot.onclick = () => {
+                        dot.classList.add('clicked');
+                        setTimeout(() => {
+                            this.calibrationArea.innerHTML = '';
+                            current++;
+                            nextPoint();
+                        }, 300);
+                    };
+                };
+                nextPoint();
+            });
+        }
+        
+        async enableMouseTracking() { 
+            this.trackingMode = 'mouse';
+            console.log('Switching to mouse tracking mode');
+            
+            // Close the calibration modal
+            this.calibrationModal.style.display = 'none';
+            this.setupOptions.style.display = 'block';
+            this.calibrationArea.style.display = 'none';
+            
+            // Enable tracking
+            this.enableSharedTracking();
+            document.addEventListener('mousemove', this.handleMouseMove);
+            this.setFocusStatus('warning', '🖱️ Fare Takibi Aktif');
+            
+            console.log('Mouse tracking enabled successfully');
+        }
+        
+        finishCalibration() { 
+            webgazer.showPredictionPoints(true);
+            this.trackingMode = 'webcam';
+            this.calibrationModal.style.display = 'none';
+            this.enableSharedTracking();
+            this.setFocusStatus('good', 'Eye Tracking 👁️');
+        }
+        
+        enableSharedTracking() { 
+            this.isEnabled = true;
+            this.focusIndicator.style.display = 'flex';
+            this.canvas.style.display = 'block';
+            this.updateButtonState('disable');
+            this.updateFocusArea();
+            this.focusCheckInterval = setInterval(() => this.checkFocus(), 500);
+            this.startRendering();
+        }
+        
+        disable() { 
+            this.isEnabled = false;
+            this.focusIndicator.style.display = 'none';
+            this.canvas.style.display = 'none';
+            this.updateButtonState('enable');
+            if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+            if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+            if (typeof webgazer !== 'undefined' && webgazer.isReady()) webgazer.end();
+            document.removeEventListener('mousemove', this.handleMouseMove);
+            this.trackingMode = 'none';
+        }
+        
+        updateButtonState(state) { 
+            if (!this.toggleButton) return;
+            
+            if (state === 'disable') {
+                this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility_off</span><span>Odak İzlemeyi Durdur</span>`;
+                this.toggleButton.className = 'flex items-center gap-2 rounded-lg bg-danger/10 text-danger hover:bg-danger/20 px-4 py-2.5 text-sm font-semibold transition-colors';
+            } else {
+                this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility</span><span>Odak İzlemeyi Başlat</span>`;
+                this.toggleButton.className = 'flex items-center gap-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2.5 text-sm font-semibold transition-colors';
+            }
+        }
+        
+        handleMouseMove = (e) => { 
+            this.handleGazeData({ x: e.clientX, y: e.clientY });
+        }
+        
+        handleGazeData(data) { 
+            if (!this.isEnabled || !data) return;
+            
+            // Log the data coming from WebGazer
+            if (Math.random() < 0.1) { // Log 10% of calls to avoid spam
+                console.log('👁️ WebGazer data received:', { x: Math.round(data.x), y: Math.round(data.y) });
+            }
+            
+            this.lastPrediction = data;
+        }
+        
+        startRendering() { 
+            if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+            let frameCount = 0;
+            const render = () => {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                if (this.isEnabled && this.lastPrediction) {
+                    frameCount++;
+                    // Log every 30 frames (about once per second at 60fps)
+                    if (frameCount % 30 === 0) {
+                        console.log('📍 Last Prediction:', this.lastPrediction);
+                    }
+                    this.drawGaze();
+                }
+                this.animationFrame = requestAnimationFrame(render);
+            };
+            this.animationFrame = requestAnimationFrame(render);
+        }
+        
+        drawGaze() { 
+            const p = this.lastPrediction;
+            if (!p || p.x === undefined || p.y === undefined) {
+                console.error('❌ Invalid prediction data:', p);
+                return;
+            }
+            this.ctx.fillStyle = 'rgba(19, 164, 236, 0.8)';
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        updateFocusArea() { 
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                const rect = mainElement.getBoundingClientRect();
+                this.focusArea = {
+                    left: rect.left,
+                    top: rect.top,
+                    right: rect.right,
+                    bottom: rect.bottom
+                };
+            }
+        }
+        
+        checkFocus() { 
+            if (!this.isEnabled || !this.focusArea || !this.lastPrediction) {
+                if (this.isEnabled) this.setFocusStatus('alert', 'No Data');
+                return;
+            }
+            
+            const p = this.lastPrediction;
+            const isFocused = (p.x >= this.focusArea.left && p.x <= this.focusArea.right &&
+                              p.y >= this.focusArea.top && p.y <= this.focusArea.bottom);
+            
+            if (isFocused) {
+                this.setFocusStatus('good', this.trackingMode === 'webcam' ? 'Eye Tracking 👁️' : 'Mouse Tracking 🖱️');
+                this.offFocusStartTime = null;
+            } else {
+                if (!this.offFocusStartTime) this.offFocusStartTime = Date.now();
+                if (Date.now() - this.offFocusStartTime > 3000) {
+                    this.setFocusStatus('alert', 'Refocus!');
+                } else {
+                    this.setFocusStatus('warning', 'Distracted...');
+                }
+            }
+        }
+        
+        setFocusStatus(status, message) {
+            // Track time in each focus status
+            const now = Date.now();
+            const timeDelta = now - this.lastFocusStatusChangeTime;
+            
+            if (this.focusStatus === 'good') {
+                this.focusGoodTime += timeDelta;
+            } else if (this.focusStatus === 'warning') {
+                this.focusWarningTime += timeDelta;
+            } else if (this.focusStatus === 'alert') {
+                this.focusAlertTime += timeDelta;
+            }
+            
+            // Update current status
+            this.focusStatus = status;
+            this.lastFocusStatusChangeTime = now;
+            
+            // Update UI
+            if (this.focusIndicator) {
+                this.focusIndicator.className = `focus-indicator focus-${status}`;
+            }
+            if (this.focusText) {
+                this.focusText.textContent = message;
+            }
+        }
+        
+        finalizeFocusTracking() {
+            // Accumulate any remaining time in the current focus status
+            if (this.isEnabled) {
+                const now = Date.now();
+                const timeDelta = now - this.lastFocusStatusChangeTime;
+                
+                if (this.focusStatus === 'good') {
+                    this.focusGoodTime += timeDelta;
+                } else if (this.focusStatus === 'warning') {
+                    this.focusWarningTime += timeDelta;
+                } else if (this.focusStatus === 'alert') {
+                    this.focusAlertTime += timeDelta;
+                }
+                
+                console.log('✅ Focus tracking finalized:', {
+                    good: Math.round(this.focusGoodTime / 1000) + 's',
+                    warning: Math.round(this.focusWarningTime / 1000) + 's',
+                    alert: Math.round(this.focusAlertTime / 1000) + 's',
+                    mode: this.trackingMode
+                });
+            }
+        }
+    }
+    
+    // Initialize eye tracking after page loads
+    const eyeTracking = new EyeTracking();
+    console.log('Eye tracking initialized:', eyeTracking.toggleButton ? 'Button found' : 'Button NOT found');
+    console.log('Eye tracking status:', eyeTracking.isEnabled);
+    
+    // --- ADDED: TAB SWITCH COUNTER ---
+    const tabSwitchCounterElement = document.getElementById('tab-switch-counter');
+    let tabSwitchCount = 0;
+
+    function handleVisibilityChange() {
+        if (document.hidden) {
+            tabSwitchCount++;
+            if (tabSwitchCounterElement) {
+                tabSwitchCounterElement.textContent = tabSwitchCount;
+            }
+        }
+    }
+    
+    if (tabSwitchCounterElement) {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    // --- MODIFIED: QUIZ AND POPUP CODE ---
+    const pageLoadTime = new Date();
+    const quizSubmitButton = document.getElementById('quiz-submit-btn');
+    const completionPopup = document.getElementById('completion-popup');
+    const timeSpentElement = document.getElementById('time-spent');
+    const continueButton = document.getElementById('continue-btn');
+
+    function formatTimeSpent(ms) {
+        const totalSeconds = Math.round(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        let result = "";
+        if (minutes > 0) result += `${minutes} dakika`;
+        if (seconds > 0) { if (minutes > 0) result += " "; result += `${seconds} saniye`; }
+        return result === "" ? "1 saniyeden az" : result;
+    }
+
+    if (quizSubmitButton) {
+        console.log('✅ Quiz submit button found and listener attached');
+        quizSubmitButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+            console.log('🔴 SUBMIT BUTTON CLICKED!');
+
+            // Stop trackers
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            
+            console.log('📊 Eye tracking state before finalization:', {
+                isEnabled: eyeTracking.isEnabled,
+                trackingMode: eyeTracking.trackingMode,
+                focusGoodTime: eyeTracking.focusGoodTime,
+                focusWarningTime: eyeTracking.focusWarningTime,
+                focusAlertTime: eyeTracking.focusAlertTime
+            });
+            
+            if (eyeTracking.isEnabled) {
+                // Finalize focus time tracking before disabling
+                eyeTracking.finalizeFocusTracking();
+                eyeTracking.disable();
+            }
+
+            const completionTime = new Date();
+            const timeDifference = completionTime - pageLoadTime;
+            if (timeSpentElement) {
+                timeSpentElement.textContent = formatTimeSpent(timeDifference);
+            }
+            
+            console.log('📊 Eye tracking state after finalization:', {
+                isEnabled: eyeTracking.isEnabled,
+                trackingMode: eyeTracking.trackingMode,
+                focusGoodTime: eyeTracking.focusGoodTime,
+                focusWarningTime: eyeTracking.focusWarningTime,
+                focusAlertTime: eyeTracking.focusAlertTime
+            });
+            
+            // Save eye tracking session data to database
+            if (eyeTracking.trackingMode !== 'none') {
+                console.log('📥 Saving eye tracking session...', {
+                    mode: eyeTracking.trackingMode,
+                    duration: Math.round(timeDifference / 1000) + 's',
+                    tabSwitches: tabSwitchCount
+                });
+                await saveEyeTrackingSession(timeDifference, tabSwitchCount, eyeTracking);
+            } else {
+                console.warn('⚠️ Tracking mode is "none" - data not saved');
+            }
+            
+            if (completionPopup) {
+                completionPopup.classList.remove('hidden');
+            }
+        });
+    } else {
+        console.error('❌ Quiz submit button NOT found!');
+    }
+
+    // Function to save eye tracking session data (works for both webcam and mouse tracking)
+    async function saveEyeTrackingSession(totalDuration, tabSwitches, eyeTrackingObj) {
+        const courseId = {{ course.id }};
+        const completionTime = new Date();
+        
+        console.log('🔍 Debug - eyeTrackingObj:', eyeTrackingObj);
+        console.log('🔍 Debug - Course ID:', courseId);
+        
+        // Convert times to seconds
+        const focusGoodSeconds = Math.round((eyeTrackingObj.focusGoodTime || 0) / 1000);
+        const focusWarningSeconds = Math.round((eyeTrackingObj.focusWarningTime || 0) / 1000);
+        const focusAlertSeconds = Math.round((eyeTrackingObj.focusAlertTime || 0) / 1000);
+        const totalDurationSeconds = Math.round(totalDuration / 1000);
+        
+        const trackingData = {
+            course_id: courseId,
+            tracking_mode: eyeTrackingObj.trackingMode, // 'webcam' or 'mouse'
+            total_duration: totalDurationSeconds,
+            tab_switches: tabSwitches,
+            focus_status_good: focusGoodSeconds,
+            focus_status_warning: focusWarningSeconds,
+            focus_status_alert: focusAlertSeconds,
+            session_data: JSON.stringify({
+                tracking_mode_used: eyeTrackingObj.trackingMode,
+                page_load_time: pageLoadTime.toISOString(),
+                session_end_time: completionTime.toISOString(),
+                final_focus_status: eyeTrackingObj.focusStatus,
+                focus_breakdown: {
+                    good_seconds: focusGoodSeconds,
+                    warning_seconds: focusWarningSeconds,
+                    alert_seconds: focusAlertSeconds,
+                    total_seconds: totalDurationSeconds
+                }
+            })
+        };
+        
+        console.log('📤 Sending tracking data:', trackingData);
+        console.log('📋 JSON payload:', JSON.stringify(trackingData, null, 2));
+        
+        try {
+            console.log('🌐 Making fetch request to /edu/save-eye-tracking...');
+            const response = await fetch('/edu/save-eye-tracking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(trackingData)
+            });
+            
+            console.log('📡 Response status:', response.status, response.statusText);
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('✅ Eye tracking session saved successfully!');
+                console.log('🔢 Session ID:', result.session_id);
+                console.log('📊 Tracking Summary:', result.tracking_data);
+                console.log('🎯 Tracking Mode:', trackingData.tracking_mode === 'mouse' ? '🖱️ Mouse' : '👁️ Webcam');
+            } else {
+                const errorText = await response.text();
+                console.error('❌ Failed to save. Status:', response.status);
+                console.error('❌ Response body:', errorText);
+                try {
+                    const error = JSON.parse(errorText);
+                    console.error('❌ Error detail:', error.detail || error);
+                } catch (e) {
+                    console.error('❌ Raw response:', errorText);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Network/Fetch error:', error);
+            console.error('❌ Error stack:', error.stack);
+        }
+    }
+
+    if (continueButton) {
+        continueButton.addEventListener('click', () => {
+            window.location.href = '#'; // Replace with your next topic URL
+        });
+    }
+</script>
+
+</html>

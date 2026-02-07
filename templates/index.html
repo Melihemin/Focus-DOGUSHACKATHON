@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FocusFlow Homepage</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6", // Blue from the logo/active state
+              "primary-dark": "#2563eb",
+              "background-light": "#f0f4f8",
+              "background-dark": "#111827",
+              "card-light": "#ffffff",
+              "card-dark": "#1f2937",
+              "text-light": "#1f2937",
+              "text-dark": "#f3f4f6",
+              "subtext-light": "#6b7280",
+              "subtext-dark": "#9ca3af",
+              "accent-green": "#10b981",
+              "accent-orange": "#f97316",
+              "soft-blue": "#dbeafe",
+              "soft-green": "#d1fae5",
+              "soft-orange": "#ffedd5",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "1rem",
+              'xl': "1.25rem",
+              '2xl': "1.5rem",
+            },
+            boxShadow: {
+                'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+            }
+          },
+        },
+      };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased">
+    <div class="min-h-screen flex flex-col">
+        {% include 'navbar.html' %}
+        <div class="flex-grow">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+<section class="relative bg-card-light dark:bg-card-dark rounded-3xl overflow-hidden shadow-card p-8 md:p-12 lg:flex lg:items-center lg:justify-between gap-12">
+<div class="lg:w-1/2 space-y-6">
+<span class="inline-block px-3 py-1 rounded-full bg-soft-blue dark:bg-blue-900/30 text-primary text-sm font-semibold tracking-wide uppercase">New Features Available</span>
+<h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                    Unlock Your <br/> <span class="text-primary">Full Potential</span>
+</h1>
+<p class="text-lg text-subtext-light dark:text-subtext-dark max-w-lg">
+                    FocusFlow adapts to your unique learning style. Master essential life skills with our colorful, engaging, and science-backed lessons.
+                </p>
+<div class="flex flex-wrap gap-4 pt-2">
+<button class="bg-primary hover:bg-primary-dark text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">
+                        Browse Catalog
+                    </button>
+<button class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 px-8 py-3.5 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                        View Roadmap
+                    </button>
+</div>
+</div>
+<div class="hidden lg:block lg:w-1/2 relative">
+<div class="absolute inset-0 bg-gradient-to-tr from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl transform rotate-3 scale-95 opacity-60"></div>
+<img alt="Students learning together" class="relative rounded-2xl shadow-xl w-full object-cover h-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkNt48ntUrE18DsuLYfE9uRZrXBUNWRfJOzZoGWLZ7zH80DRGxslmmO11CDppCCroUFGdWRXhjD2SR4WnPan_EwUNegrFRXgK-HTqFhp9GYoWClYpQJnZQ4bLz23DxeAn_xlr2TfYs2COAzkzsGbqCM7RUirTxzx05AU75nC0ktOXEIKxQThnVC75Lp_q_CX6Q3qK2Rsucul1icOUkH5FWGMJP8zSTLMMlnLbqrOCJ8RDSRt3tJF7Z3L1OUlINMQ26-ZSfF75Gz8ln"/>
+</div>
+</section>
+<section>
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="text-3xl font-bold text-gray-900 dark:text-white">Explore</h2>
+<p class="text-subtext-light dark:text-subtext-dark mt-2">Pick up exactly where you left off.</p>
+</div>
+<a class="hidden sm:block text-primary font-semibold hover:text-primary-dark" href="#">View all activity →</a>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-2xl shadow-card p-6 md:p-8 flex flex-col md:flex-row gap-8 items-center border border-gray-100 dark:border-gray-800">
+<div class="flex-shrink-0 bg-soft-blue dark:bg-blue-900/20 p-6 rounded-2xl">
+<span class="material-icons text-4xl text-primary">psychology</span>
+</div>
+<div class="flex-grow w-full">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white">Focus &amp; Attention</h3>
+<p class="text-subtext-light dark:text-subtext-dark">Module 18: Advanced Mindfulness Techniques</p>
+</div>
+<span class="bg-blue-100 dark:bg-blue-900 text-primary text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">In Progress</span>
+</div>
+<div class="mt-4">
+<div class="flex justify-between text-sm font-semibold mb-2 text-gray-600 dark:text-gray-400">
+<span>0/20 Modules Completed</span>
+<span class="text-primary">0%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+<div class="bg-primary h-3 rounded-full" style="width: 0%"></div>
+</div>
+</div>
+<div class="mt-6 flex gap-6 text-sm text-subtext-light dark:text-subtext-dark">
+<div class="flex items-center gap-2">
+<span class="material-icons text-base">schedule</span>
+                            ~ 45 min left
+                        </div>
+<div class="flex items-center gap-2">
+<span class="material-icons text-base">layers</span>
+                            3 Modules remaining
+                        </div>
+</div>
+</div>
+<div class="flex-shrink-0 w-full md:w-auto">
+<button class="w-full md:w-auto bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2">
+<span class="material-icons">play_arrow</span>
+                        Start
+                    </button>
+</div>
+</div>
+</section>
+<section>
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recommended For You</h2>
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+<a class="group block bg-card-light dark:bg-card-dark rounded-xl overflow-hidden shadow-sm hover:shadow-card transition-all border border-gray-100 dark:border-gray-800" href="#">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative">
+<img alt="Course thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzHZ7rsCUjDCeU5pJAUuDZmMPgNDYscDP8dFqeT_xngnTXLRg3yJXpIibmHPG-yoHEkgYoO8ff2sLIMyYsI7Y-9V37zTZbmqyi33Zkig-_Nl9OFfbCQJMmvv5vgifoDMBrNr86ly2oFCqHsJB5BFd1bpIEVYgwJQcXb12HvsqVqdoX9vSPHxSgyEhJRdWA2wjcwQB9oKri-EolcoeXq1pl-yGIddyEUhc4aFzjjhUM-LFY-wKOdDOvby208Pmw_DB8MI8V-SZRc39a"/>
+<div class="absolute top-2 right-2 bg-white/90 dark:bg-black/80 px-2 py-1 rounded text-xs font-bold text-gray-800 dark:text-gray-200">New</div>
+</div>
+<div class="p-4">
+<h4 class="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Creative Thinking</h4>
+<p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Unlock your inner artist</p>
+<div class="mt-3 flex items-center text-xs text-gray-500 font-medium">
+<span class="material-icons text-sm mr-1">star</span> 4.8
+                        </div>
+</div>
+</a>
+<a class="group block bg-card-light dark:bg-card-dark rounded-xl overflow-hidden shadow-sm hover:shadow-card transition-all border border-gray-100 dark:border-gray-800" href="#">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative">
+<img alt="Course thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaeFyGMOlW-xaxcEaXpzi92TJYCegE2F91BUilgyUILjuYVBQNhZz6iTZ35Lm0MsFLUzyp6Pbh1oyfYpoh0eEHO6XaC-aU5Fnf2zIEYF8sDcXgSgco9E2O4J-p7sjAsUPl4yzY44AqNSx3Sz33rqKuROYOF0rufUtzGrXRzn8RZVraBWcPUDGoNc76vEux9p5oT4MtsllipFrmlFLDwWMU1biuGcwbllfga61vVpTIaeQNew7an3IhZmyk8cLevqMhslzzikD_8ty9"/>
+</div>
+<div class="p-4">
+<h4 class="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Public Speaking</h4>
+<p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Speak with confidence</p>
+<div class="mt-3 flex items-center text-xs text-gray-500 font-medium">
+<span class="material-icons text-sm mr-1">star</span> 4.9
+                        </div>
+</div>
+</a>
+<a class="group block bg-card-light dark:bg-card-dark rounded-xl overflow-hidden shadow-sm hover:shadow-card transition-all border border-gray-100 dark:border-gray-800" href="#">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative">
+<img alt="Course thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2Sbt6RW3GhvDhIXjmOQuqQigppgbdC9bN_P8MdgMQBxGd06pqX4qkICWGFcPldsg-AJqZPUy49KiE9kVJO73zN5zlueiHPh4zZ-Tp5Mc06D73nkz-DiCii4-EDiGso0syq8QKmvc-mMhvPz2QTUW4Sq1PGE25Wi1po_BIx4WlfhxzV8BV1tBuo56c5l1N9YlGrHWgs6ouzdggoARErCxmqnGO_b4NLMNBbu0kpUnWK18be3Akh1rxTfCbJohxnJlLeJ1-qVrxtMLP"/>
+</div>
+<div class="p-4">
+<h4 class="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">School Life Balance</h4>
+<p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Manage stress effectively</p>
+<div class="mt-3 flex items-center text-xs text-gray-500 font-medium">
+<span class="material-icons text-sm mr-1">star</span> 4.7
+                        </div>
+</div>
+</a>
+<a class="group block bg-card-light dark:bg-card-dark rounded-xl overflow-hidden shadow-sm hover:shadow-card transition-all border border-gray-100 dark:border-gray-800" href="#">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative">
+<img alt="Course thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTTWhv5gIDPXv3hMiTTqQNXnG3-dG8z6A4mRXvYhqeBicU0LpSK422ScVC8goDVWYEVhJZlKHRF2AhgG6rQaN_X8r43eFo_WNu7-pV1VcZyJiYtl5ttlfPzrkYnYqsZkDeGSc0x8EPTE35JkkeEL4KGMUhnb0lzwOEibtb4LxMk53eyLbwO1KmVVKhivM6wzNtTYkYQhHT3dyeYHtKhqMFpQjpZemo2hRWPWIxYSt7_FdhDruuuHwD2km21u2d7NWsRy8INzJLie3H"/>
+</div>
+<div class="p-4">
+<h4 class="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Team Leadership</h4>
+<p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Lead small groups</p>
+<div class="mt-3 flex items-center text-xs text-gray-500 font-medium">
+<span class="material-icons text-sm mr-1">star</span> 4.6
+                        </div>
+</div>
+</a>
+</div>
+</section>
+</main>
+<footer class="bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-800 mt-12 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+<svg class="text-primary" fill="currentColor" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 3H19C19.5523 3 20 3.44772 20 4V6C20 6.55228 19.5523 7 19 7H5C4.44772 7 4 6.55228 4 6V4C4 3.44772 4.44772 3 5 3Z"></path>
+<path d="M5.8 8H18.2L12 15L5.8 8Z"></path>
+<path d="M12 16L15 19V21L9 21V19L12 16Z"></path>
+</svg>
+<span class="font-semibold">© 2023 FocusFlow Inc.</span>
+</div>
+<div class="flex gap-6 text-sm text-gray-500 dark:text-gray-400">
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+
+</body></html>

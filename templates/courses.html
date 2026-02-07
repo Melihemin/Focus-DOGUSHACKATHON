@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FocusFlow All Courses Library</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111318] dark:text-white overflow-x-hidden">
+<div class="relative flex min-h-screen flex-col">
+<!-- TopNavBar -->
+{% include 'navbar.html' %}
+<main class="flex-1 px-4 lg:px-40 py-8">
+<div class="mx-auto max-w-[1280px]">
+<!-- PageHeading -->
+<div class="flex flex-col gap-6 mb-8">
+<div class="flex flex-wrap justify-between items-end gap-4">
+<div class="flex flex-col gap-2">
+<h1 class="text-[#111318] dark:text-white tracking-tight text-[32px] font-bold leading-tight">All Courses Library</h1>
+<p class="text-[#616f89] dark:text-gray-400 text-base font-normal leading-normal max-w-2xl">Expand your skills with our expert-led courses on productivity and wellbeing.</p>
+</div>
+</div>
+<!-- SearchBar & Chips -->
+<div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+<div class="w-full md:max-w-[400px]">
+<label class="flex flex-col h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full border border-[#e5e7eb] dark:border-[#4a5568] overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
+<div class="text-[#616f89] dark:text-gray-400 flex bg-white dark:bg-[#1a202c] items-center justify-center pl-4 pr-2">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none bg-white dark:bg-[#1a202c] text-[#111318] dark:text-white focus:outline-0 border-none h-full placeholder:text-[#616f89] dark:placeholder:text-gray-500 px-2 text-base font-normal leading-normal" placeholder="Search for courses, skills..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary text-white px-4 transition-colors">
+<span class="text-sm font-medium leading-normal">All</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#f0f2f4] dark:bg-[#2d3748] hover:bg-[#e2e4e8] dark:hover:bg-[#4a5568] text-[#111318] dark:text-gray-200 px-4 transition-colors">
+<span class="text-sm font-medium leading-normal">Productivity</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#f0f2f4] dark:bg-[#2d3748] hover:bg-[#e2e4e8] dark:hover:bg-[#4a5568] text-[#111318] dark:text-gray-200 px-4 transition-colors">
+<span class="text-sm font-medium leading-normal">Design</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#f0f2f4] dark:bg-[#2d3748] hover:bg-[#e2e4e8] dark:hover:bg-[#4a5568] text-[#111318] dark:text-gray-200 px-4 transition-colors">
+<span class="text-sm font-medium leading-normal">Wellness</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#f0f2f4] dark:bg-[#2d3748] hover:bg-[#e2e4e8] dark:hover:bg-[#4a5568] text-[#111318] dark:text-gray-200 px-4 transition-colors">
+<span class="text-sm font-medium leading-normal">Business</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-8">
+<!-- Sidebar Filters -->
+<aside class="w-full lg:w-64 shrink-0 flex flex-col gap-8">
+<div>
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-[#f0f2f4] dark:border-[#2d3748]">
+<h3 class="text-[#111318] dark:text-white text-lg font-bold leading-tight">Filters</h3>
+<button class="text-primary text-sm font-medium hover:underline">Reset</button>
+</div>
+<!-- Level Filter -->
+<div class="py-2">
+<h4 class="text-[#111318] dark:text-white text-base font-semibold mb-3">Level</h4>
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer size-5 appearance-none rounded border border-[#d1d5db] dark:border-[#4a5568] checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[16px] opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<span class="text-[#111318] dark:text-gray-300 text-sm font-medium group-hover:text-primary transition-colors">Beginner</span>
+<span class="ml-auto text-[#616f89] dark:text-gray-500 text-xs">124</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer size-5 appearance-none rounded border border-[#d1d5db] dark:border-[#4a5568] checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[16px] opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<span class="text-[#111318] dark:text-gray-300 text-sm font-medium group-hover:text-primary transition-colors">Intermediate</span>
+<span class="ml-auto text-[#616f89] dark:text-gray-500 text-xs">86</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer size-5 appearance-none rounded border border-[#d1d5db] dark:border-[#4a5568] checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[16px] opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<span class="text-[#111318] dark:text-gray-300 text-sm font-medium group-hover:text-primary transition-colors">Advanced</span>
+<span class="ml-auto text-[#616f89] dark:text-gray-500 text-xs">42</span>
+</label>
+</div>
+</div>
+<!-- Price Filter -->
+<div class="py-4 border-t border-[#f0f2f4] dark:border-[#2d3748] mt-2">
+<h4 class="text-[#111318] dark:text-white text-base font-semibold mb-3">Price</h4>
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer size-5 appearance-none rounded border border-[#d1d5db] dark:border-[#4a5568] checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[16px] opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<span class="text-[#111318] dark:text-gray-300 text-sm font-medium group-hover:text-primary transition-colors">Free</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer size-5 appearance-none rounded border border-[#d1d5db] dark:border-[#4a5568] checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[16px] opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<span class="text-[#111318] dark:text-gray-300 text-sm font-medium group-hover:text-primary transition-colors">Paid</span>
+</label>
+</div>
+</div>
+<!-- Rating Filter -->
+<div class="py-4 border-t border-[#f0f2f4] dark:border-[#2d3748] mt-2">
+<h4 class="text-[#111318] dark:text-white text-base font-semibold mb-3">Rating</h4>
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="peer size-4 appearance-none rounded-full border border-[#d1d5db] dark:border-[#4a5568] checked:bg-primary checked:border-primary transition-colors" name="rating" type="radio"/>
+<div class="flex items-center text-[#F59E0B]">
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current text-[#d1d5db] dark:text-[#4a5568]">star</span>
+</div>
+<span class="text-[#111318] dark:text-gray-300 text-sm font-medium">&amp; Up</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="peer size-4 appearance-none rounded-full border border-[#d1d5db] dark:border-[#4a5568] checked:bg-primary checked:border-primary transition-colors" name="rating" type="radio"/>
+<div class="flex items-center text-[#F59E0B]">
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current text-[#d1d5db] dark:text-[#4a5568]">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current text-[#d1d5db] dark:text-[#4a5568]">star</span>
+</div>
+<span class="text-[#111318] dark:text-gray-300 text-sm font-medium">&amp; Up</span>
+</label>
+</div>
+</div>
+</div>
+</aside>
+<!-- Course Grid -->
+<div class="flex-1">
+{% if courses and courses|length > 0 %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+{% for course in courses %}
+<!-- Course Card: {{ course.title }} -->
+<a href="/edu/courses/{{ course.id }}" class="group flex flex-col gap-3 rounded-xl bg-white dark:bg-[#1a202c] shadow-sm hover:shadow-md transition-shadow border border-[#f0f2f4] dark:border-[#2d3748] overflow-hidden">
+<div class="relative w-full pt-[56.25%] overflow-hidden bg-gradient-to-br from-primary to-blue-600 dark:from-blue-700 dark:to-blue-900">
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-6xl opacity-20">school</span>
+</div>
+<div class="absolute top-3 left-3 bg-white/90 dark:bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-[#111318] dark:text-white shadow-sm">
+ID: {{ course.id }}
+</div>
+</div>
+<div class="flex flex-col flex-1 p-4 gap-2">
+<div class="flex justify-between items-start">
+<h3 class="text-[#111318] dark:text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">{{ course.title }}</h3>
+</div>
+<p class="text-[#616f89] dark:text-gray-400 text-sm line-clamp-3">{{ course.description }}</p>
+<div class="mt-auto pt-3 flex items-center justify-between border-t border-[#f0f2f4] dark:border-[#2d3748]">
+<div class="flex items-center gap-2 text-[#616f89] dark:text-gray-500">
+<span class="material-symbols-outlined text-sm">calendar_month</span>
+<span class="text-xs font-medium">{{ course.date_created.strftime('%d %b %Y') if course.date_created else 'N/A' }}</span>
+</div>
+{% if course.total_duration %}
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-[#616f89] dark:text-gray-500">schedule</span>
+<span class="text-xs font-medium text-[#616f89] dark:text-gray-500">{{ course.total_duration }}</span>
+</div>
+{% endif %}
+</div>
+</div>
+</a>
+{% endfor %}
+</div>
+{% else %}
+<!-- Empty State -->
+<div class="flex flex-col items-center justify-center py-16 px-4">
+<div class="w-24 h-24 rounded-full bg-[#f0f2f4] dark:bg-[#2d3748] flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-5xl text-[#616f89] dark:text-gray-500">school</span>
+</div>
+<h3 class="text-[#111318] dark:text-white text-xl font-bold mb-2">No courses available yet</h3>
+<p class="text-[#616f89] dark:text-gray-400 text-center max-w-md">Start adding courses to build your library. Use the API to add new course content.</p>
+</div>
+{% endif %}
+<!-- Pagination -->
+<div class="flex justify-center mt-10">
+<nav class="flex items-center gap-2">
+<button class="flex size-9 items-center justify-center rounded-lg border border-[#e5e7eb] dark:border-[#4a5568] hover:bg-[#f0f2f4] dark:hover:bg-[#2d3748] disabled:opacity-50 transition-colors" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="flex size-9 items-center justify-center rounded-lg bg-primary text-white font-bold text-sm">1</button>
+<button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#f0f2f4] dark:hover:bg-[#2d3748] text-[#111318] dark:text-gray-300 font-medium text-sm transition-colors">2</button>
+<button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#f0f2f4] dark:hover:bg-[#2d3748] text-[#111318] dark:text-gray-300 font-medium text-sm transition-colors">3</button>
+<span class="text-[#616f89] dark:text-gray-500">...</span>
+<button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#f0f2f4] dark:hover:bg-[#2d3748] text-[#111318] dark:text-gray-300 font-medium text-sm transition-colors">12</button>
+<button class="flex size-9 items-center justify-center rounded-lg border border-[#e5e7eb] dark:border-[#4a5568] hover:bg-[#f0f2f4] dark:hover:bg-[#2d3748] transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
